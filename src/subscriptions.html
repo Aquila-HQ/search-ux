@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156570061-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-156570061-1');
+    </script>
+
+    <title>Aquila X | Explore</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+
+  <body class="bg-gradient-to-b from-indigo-300 to-purple-400 min-h-screen">
+    <div class="shadow flex flex-row justify-between gap-2 items-center h-10 bg-indigo-100">
+        <div class="items-center">
+            <b class=" pl-7"></b>
+            <a class="text-xs text-purple-600 hover:underline" href="/">Home</a>
+            <a class="text-xs text-purple-600 hover:underline pl-2" href="/explore.html">Explore</a>
+            <a class="text-xs text-purple-600 hover:underline font-bold pl-2" href="/subscriptions.html">Subscriptions</a>
+            <a class="text-xs text-purple-600 hover:underline pl-2" href="/help.html">Help</a>
+        </div>
+        <div class="hidden flex flex-row gap-2 items-center" id="usernameDisplayContainer">
+            <p class="text-xs text-gray-600" id="usernameDisplay"></p>
+            <div class="bg-purple-600 rounded-full text-sm text-white text-bold p-1 w-7 h-7 justify-center items-center" >
+            <p id="userAvatarDisplay">UN</p>
+            </div>
+            <b class=" pl-5"></b>
+        </div>
+        <a class="hidden mr-5 bg-transparent hover:bg-purple-500 text-purple-700  text-sm font-semibold hover:text-white py-1 px-2 border border-purple-500 hover:border-transparent rounded" id="usernameDisplayCreate" href="https://aquila.network/index.html#form9-3">
+            Create Account
+        </a>
+        <!-- <b class=" pl-3"></b> -->
+    </div>
+
+    <div class="items-center ml-10 mr-10 p-1">
+        <h2 class="text-2xl text-white font-bold mt-10 underline">Your subscriptions</h2>
+    </div>
+    <div class="grid grid-cols-1 p-7 pl-10">
+        <div class="flex flex-col gap-3" id="container">
+        </div>
+    </div>
+    <script src="javascript/main.js"></script>
+    <script>
+        window.onload = function () {
+            triggerOnLoad()
+            getUserSecret ((ukey) => {
+                if (ukey != null) {
+                    postData("/api/subscribe/list", { "key": ukey })
+                    .then(data => {
+                        if (data.success) {
+                            data.subscribeList.forEach((sub) => {
+                                getUserProfilePub(sub.publicIndexId, (userData) => {
+                                    document.querySelector('#container').innerHTML += '<a class="border border-purple-200 rounded font-bold p-2 text-white" href="/?share=' + sub.publicIndexId + '">' + userData.name + '</a>'
+                                })
+                            })
+                        }
+                    });
+                }
+            });
+        }
+
+        function getUserProfilePub (publicIndexId, cbk) {
+            let url = "/api/user";
+            let dataIn = { "publicIndexId": publicIndexId };
+
+            postData(url, dataIn)
+            .then(data => {
+                if (data.success) {
+                    cbk(data.user[0])
+                }
+            });
+        }
+    
+        async function postData(url = '', data = {}) {
+            // Default options are marked with *
+            const response = await fetch(url, {
+                method: 'POST', // *GET, POST, PUT, DELETE, etc.
+                mode: 'cors', // no-cors, *cors, same-origin
+                cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+                credentials: 'same-origin', // include, *same-origin, omit
+                headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                redirect: 'follow', // manual, *follow, error
+                referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
+                body: JSON.stringify(data) // body data type must match "Content-Type" header
+            });
+    
+            if (response.status != 200) {
+                return {
+                "success": false
+                };
+            }
+            else {
+                return response.json(); // parses JSON response into native JavaScript objects
+            }
+        }
+    </script>
+  </body>
+</html>
