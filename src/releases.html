@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-156570061-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-156570061-1');
+    </script>
+
+    <title>Aquila X | Releases</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  </head>
+
+  <body class="">
+    <div class="shadow flex flex-row justify-between gap-2 items-center h-10 bg-white-100">
+        <div class="items-center">
+            <b class=" pl-7"></b>
+            <a class="text-xs text-purple-600 hover:underline" href="/">Home</a>
+            <a class="text-xs text-purple-600 hover:underline pl-2" href="/explore.html">Explore</a>
+            <a class="text-xs text-purple-600 hover:underline pl-2" href="/subscriptions.html">Subscriptions</a>
+            <a class="text-xs text-purple-600 hover:underline pl-2" href="/help.html">Help</a>
+            <a class="text-xs text-purple-600 hover:underline font-bold pl-2" href="/releases.html">Releases</a>
+        </div>
+    </div>
+
+    <div class="grid justify-items-center ml-10 mr-10 p-1">
+        <h2 class="text-2xl font-bold mt-10">What's new in Aquila Network</h2>
+    </div>
+    <div class="grid grid-cols-1 ml-52 mr-52 mt-10">
+        <p>Aquila Network is a suit of tools ranging from Open Source softwares that anybody can install on their devices to dedicated cloud offerings for convinience of non technical users.</p>
+        
+        <div class="bg-gray-100 mt-10 m-3 p-5">
+            <h3 class="text-2xl font-bold">Aquila Network 1.x.x</h3>
+            <div class="flex pt-10 pl-10">
+                <h4 class="text-lg font-bold text-gray-500">Aquila Network 1.0.0</h4>
+                <h4 class="pl-3 text-lg font-bold text-gray-400">25 Nov 2021</h4>
+            </div>
+            
+            <div class="grid grid-cols-2 pl-10 pt-3 gap-3">
+                <div>
+                    <p class="font-bold pb-2">Open Source</p>
+                    <div class="flex">
+                        <p class="font-bold pb-2">Aquila DB</p>
+                        <a class="font-bold pl-2 pb-2 underline" href="https://github.com/Aquila-Network/AquilaDB/releases/tag/v0.4.0" target="_blank">v0.4.0</a>
+                    </div>
+                    <ul class="list-inside list-disc">
+                        <li>Schema definition for DB creation is introduced</li>
+                        <li>Database name is universally auto generated from schema CID</li>
+                        <li>Schema based document validation added</li>
+                        <li>Delete document API introduced</li>
+                        <li>Cryptographic authentication is added</li>
+                        <li>Single script installation</li>
+                        <li>Better failure recovery and backup</li>
+                        <li>Bug fixes</li>
+                        
+                    </ul>
+                    <div class="flex pt-3">
+                        <p class="font-bold pb-2">Aquila HUB</p>
+                        <a class="font-bold pl-2 pb-2 underline" href="https://github.com/Aquila-Network/AquilaHub/releases/tag/v0.1.0" target="_blank">v0.1.0</a>
+                    </div>
+                    <ul class="list-inside list-disc">
+                        <li>Added automatic Transformer model downloads from sentence transformers</li>
+                        <li>Persist model on disk for re-usability across Aquila HUB instances</li>
+                        <li>Added automatic Fasttext model downloads from a url and load it into memory on demand</li>
+                        <li>Bug fixes</li>
+                        
+                    </ul>
+                    <div class="flex pt-3">
+                        <p class="font-bold pb-2">Aquila PORT</p>
+                        <a class="font-bold pl-2 pb-2 underline" href="https://github.com/Aquila-Network/AquilaPort/releases/tag/v0.0.1" target="_blank">v0.0.1</a>
+                    </div>
+                    <ul class="list-inside list-disc">
+                        <li>Couch minified Replication Protocol</li>
+                        <li>Bug fixes</li>
+                    </ul>
+                    <div class="flex pt-3">
+                        <p class="font-bold pb-2">Aquila Py</p>
+                        <a class="font-bold pl-2 pb-2 underline" href="https://github.com/Aquila-Network/AquilaPy/releases/tag/v0.3.1" target="_blank">v0.3.1</a>
+                    </div>
+                    <ul class="list-inside list-disc">
+                        <li>Implemented Wallet(RSA), DB, HUB clients</li>
+                        <li>Bug fixes</li>
+                    </ul>
+                    <div class="flex pt-3">
+                        <p class="font-bold pb-2">Aquila JS</p>
+                        <a class="font-bold pl-2 pb-2 underline" href="https://github.com/Aquila-Network/AquilaJS/releases/tag/v1.0.0" target="_blank">v1.0.0</a>
+                    </div>
+                    <ul class="list-inside list-disc">
+                        <li>Implemented Wallet(RSA), DB, HUB clients</li>
+                        <li>Bug fixes</li>
+                    </ul>
+                </div>
+                <div>
+                    <p class="font-bold pb-2">Cloud Service</p>
+                    <div class="flex">
+                        <p class="font-bold pb-2">Aquila X</p>
+                    </div>
+                    <ul class="list-inside list-disc">
+                        <li>User authentication with secret key</li>
+                        <li>Subscribe to public bookmarks</li>
+                        <li>List and search all bookmarks</li>
+                        <li>Explore public bookmarks</li>
+                        <li>Bug fixes</li>
+                    </ul>
+                    <div class="flex pt-3">
+                        <p class="font-bold pb-2">Browser Extensions</p>
+                    </div>
+                    <ul class="list-inside list-disc">
+                        <li>Index web pages to localhost</li>
+                        <li>Index web pages to X cloud service</li>
+                        <li>Authenticate user to cloud service</li>
+                        <li>Bug fixes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-20 mb-10 grid justify-items-center text-xs">© 2021 Aquila Network</div>
+  </body>
+</html>

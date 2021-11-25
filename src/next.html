@@ -18,20 +18,71 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
   </head>
 
-  <body class="min-h-screen grid grid-cols-3 place-items-center bg-gradient-to-r from-indigo-200 to-yellow-100">
-    <div></div>
-    <div class="flex flex-col place-items-center gap-4">
-        <p class="text-pink-600 text-xl font-extrabold flex-1">Install Aquila Extension for your browser</p>
-        <div class="grid grid-cols-2 place-items-center gap-4 flex-shrink-0">
-            <button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">
-                Google Chrome
-            </button>
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
-                Mozilla Firefox
-            </button>
+  <body>
+    <div class="min-h-screen grid grid-cols-3 place-items-center bg-gradient-to-r from-indigo-200 to-yellow-100">
+      <div></div>
+        <div class="flex flex-col place-items-center gap-4">
+          <p class="text-pink-600 text-3xl font-extrabold flex-1">Congratulations!🎉</p>
+          <p class="text-pink-600 text-xl font-extrabold flex-1">Aquila X is installed successfully.</p>
+          <p class="mt-10 text-pink-600 font-extrabold flex-1">Choose to which service you want to connect:</p>
+          <div class="grid grid-cols-2 place-items-center gap-4 flex-shrink-0">
+              <a href="#managed"><button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">
+                  Aquila.Network
+              </button></a>
+              <a href="#onpremise"><button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full">
+                  Personal Server
+              </button></a>
+          </div>
         </div>
-        <p class="text-gray-800 text-xs flex-1">Source code of above extensions are made available <a class="text-blue-700 underline" href="https://github.com/Aquila-Network/AquilaX-browser-extension" >here</a>.</p>
+      <div></div>
     </div>
-    <div></div>
+
+    <div class="min-h-screen grid grid-cols-3 place-items-center bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-400" id="managed">
+      <div></div>
+      <div class="flex flex-col place-items-center gap-4">
+        <p class="text-pink-600 text-xl font-extrabold flex-1">Generate and Update Aquila X secret</p>
+        <ul class="list-inside list-decimal">
+          <li class="text-pink-600 ">Go <a href="https://aquila.network/" class="text-blue-600 underline" target="_blank">here</a> and sign up for beta to receive your secret. </li>
+          <li class="text-pink-600 ">Go to 'edit settings', and paste your secret.</li>
+        </ul>
+        <img alt="" src="img/addon_server.png" style="width: 200px; margin-left: 0.00px; margin-top: 0.00px;" title="">
+        <div class="grid grid-cols-1 place-items-center gap-4 flex-shrink-0">
+          <a href="#final"><button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">
+                Done
+            </button></a>
+        </div>
+      </div>
+      <div></div>
+    </div>
+
+    <div class="min-h-screen grid grid-cols-3 place-items-center bg-gradient-to-r from-yellow-200 via-green-200 to-green-500" id="onpremise">
+      <div></div>
+      <div class="flex flex-col place-items-center gap-4">
+        <p class="text-pink-600 text-xl  flex-1">Generate and Update Aquila X secret</p>
+        <ul class="list-inside list-decimal">
+          <li class="text-pink-600 ">Install Aquila Network on-premise server from <a href="https://github.com/Aquila-Network/awesome-aquila-network#single-command-install-to-get-started" class="text-blue-600 underline" target="_blank">Github</a>. </li>
+          <li class="text-pink-600 ">Make sure you're set to 'localhost' as shown below.</li>
+        </ul>
+        <img alt="" src="img/addon_lhost.png" style="width: 200px; margin-left: 0.00px; margin-top: 0.00px;" title="">
+        <div class="grid grid-cols-1 place-items-center gap-4 flex-shrink-0">
+            <a href="#final"><button class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-full">
+                Done
+            </button></a>
+        </div>
+      </div>
+      </div><div>
+    </div>
+
+    <div class="min-h-screen grid grid-cols-3 place-items-center bg-gradient-to-r from-indigo-200 to-yellow-100" id="final">
+      <div></div>
+        <div class="flex flex-col place-items-center gap-4">
+          <p class="text-pink-600 text-3xl font-extrabold flex-1">Awesome! You are ready.</p>
+          <p class="text-pink-600 flex-1">Now you can start bookmarking your favourite websites.</p>
+          <p class="mt-10 text-pink-600 flex-1">Also, try searching your bookmarks with a '!!'</p>
+          <img alt="" src="img/ecx_search.png" style="width: 400px; margin-left: 0.00px; margin-top: 0.00px;" title="">
+          <p class="mt-10 text-gray-900 font-thin text-xs flex-1">With ❤️ Aquila Network</p>
+        </div>
+      <div></div>
+    </div>
   </body>
 </html>
