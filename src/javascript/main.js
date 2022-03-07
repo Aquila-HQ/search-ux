@@ -19,6 +19,12 @@ function triggerOnLoad () {
     shareID = null
   }
 
+  // if it is a public bookmark, show loading message
+  let container = document.querySelector(".js-container-def-txt");
+  if (shareID != null) {
+    container.innerHTML = "loading bookmarks.."
+  }
+
   // trigger search if query param is found
   if (queryText != null && queryText.trim() != "") {
     document.querySelector(".cleartxt").classList.remove("hidden");
