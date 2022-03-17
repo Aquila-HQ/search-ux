@@ -129,7 +129,9 @@ function initSearchResults() {
                 "author": "John Smith",
                 "website": "medium.com"
             }
-        ]
+        ],
+        resultsPerPage: 10,
+        currentPage: 1
     })
 
     Alpine.store('publicResults', {
@@ -153,7 +155,9 @@ function initSearchResults() {
                 "author": "John Smith",
                 "website": "medium.com"
             }
-        ]
+        ],
+        resultsPerPage: 10,
+        currentPage: 1
     })
 
     Alpine.store('mixedResults', {
@@ -177,7 +181,9 @@ function initSearchResults() {
                 "author": "John Smith",
                 "website": "medium.com"
             }
-        ]
+        ],
+        resultsPerPage: 10,
+        currentPage: 1
     })
 }
 
