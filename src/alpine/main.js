@@ -31,6 +31,8 @@ window.onload = function () {
 
 }
 
+// ----------------------------- 1) Configure Alpine datastructures --------------------------------------------------
+
 function initURLParams() {
     // Initialize by fetching anything that's available in the url parameters for later actions 
     Alpine.store('urlParams', {
@@ -187,3 +189,34 @@ function initSearchResults() {
     })
 }
 
+// ----------------------------------- 2) API calls to addon / server -----------------------------------------
+
+function fetchSecretADDON (addonKey) {
+
+}
+
+function AuthenticateAPI (host, secretKey) {
+
+}
+
+function fetchUserAPI (host, secretKey) {
+
+}
+
+function fetchProfileAPI (host, publicID) {
+
+}
+
+function listAPI (host, publicID, page, noItems) {
+
+}
+
+function searchAPI (host, publicID, query, page, noItems) {
+
+}
+
+function correct (host, secretKey, query, url, itemID) {
+
+}
+
+// ----------------------------------- 3) Event listeners & actions -----------------------------------------
