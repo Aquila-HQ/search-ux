@@ -116,20 +116,20 @@ function initSearchResults() {
         },
         results: [
             {
-                "title": "I'm a simple link title 1",
-                "url": "https://google.com",
-                "description": "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                "timestamp": 123456789,
-                "author": "John Smith",
-                "website": "medium.com"
+                title: "I'm a simple link title 1",
+                url: "https://google.com",
+                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+                timestamp: 123456789,
+                author: "John Smith",
+                website: "medium.com"
             },
             {
-                "title": "I'm a simple link title 2",
-                "url": "https://google.com",
-                "description": "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                "timestamp": 123456789,
-                "author": "John Smith",
-                "website": "medium.com"
+                title: "I'm a simple link title 2",
+                url: "https://google.com",
+                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+                timestamp: 123456789,
+                author: "John Smith",
+                website: "medium.com"
             }
         ],
         resultsPerPage: 10,
@@ -142,20 +142,20 @@ function initSearchResults() {
         },
         results: [
             {
-                "title": "I'm a simple link title 1",
-                "url": "https://google.com",
-                "description": "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                "timestamp": 123456789,
-                "author": "John Smith",
-                "website": "medium.com"
+                title: "I'm a simple link title 1",
+                url: "https://google.com",
+                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+                timestamp: 123456789,
+                author: "John Smith",
+                website: "medium.com"
             },
             {
-                "title": "I'm a simple link title 2",
-                "url": "https://google.com",
-                "description": "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                "timestamp": 123456789,
-                "author": "John Smith",
-                "website": "medium.com"
+                title: "I'm a simple link title 2",
+                url: "https://google.com",
+                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+                timestamp: 123456789,
+                author: "John Smith",
+                website: "medium.com"
             }
         ],
         resultsPerPage: 10,
@@ -168,20 +168,20 @@ function initSearchResults() {
         },
         results: [
             {
-                "title": "I'm a simple link title 1",
-                "url": "https://google.com",
-                "description": "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                "timestamp": 123456789,
-                "author": "John Smith",
-                "website": "medium.com"
+                title: "I'm a simple link title 1",
+                url: "https://google.com",
+                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+                timestamp: 123456789,
+                author: "John Smith",
+                website: "medium.com"
             },
             {
-                "title": "I'm a simple link title 2",
-                "url": "https://google.com",
-                "description": "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                "timestamp": 123456789,
-                "author": "John Smith",
-                "website": "medium.com"
+                title: "I'm a simple link title 2",
+                url: "https://google.com",
+                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+                timestamp: 123456789,
+                author: "John Smith",
+                website: "medium.com"
             }
         ],
         resultsPerPage: 10,
