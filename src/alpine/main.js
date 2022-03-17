@@ -1,5 +1,16 @@
 console.log("Welcome to Aquila Network")
 
+// Tailwind configurations
+tailwind.config = {
+    theme: {
+        extend: {
+            colors: {
+                clifford: '#da373d',
+            }
+        }
+    }
+}
+
 // Alpine initialized succesfully
 document.addEventListener('alpine:init', () => {
     // Initialize all Alpine datastructures (Alpine Store)
@@ -57,7 +68,7 @@ function initAuthentication() {
             // get authentication status from API
             this.isAuthenticated = !this.isAuthenticated
         },
-        isAuthenticated: true,
+        isAuthenticated: false,
         loadUserInfo() {
             // get user information from API
         },
@@ -170,13 +181,3 @@ function initSearchResults() {
     })
 }
 
-
-tailwind.config = {
-    theme: {
-        extend: {
-            colors: {
-                clifford: '#da373d',
-            }
-        }
-    }
-}
