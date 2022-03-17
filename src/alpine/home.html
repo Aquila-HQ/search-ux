@@ -13,7 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@2.6.1/dist/full.css" rel="stylesheet" type="text/css" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
-
+    <script src="https://unpkg.com/alpinejs" defer></script>
 </head>
 
 <body>
@@ -57,23 +57,35 @@
                 <img class="w-10 h-10 mask mask-circle rounded-full"
                     src="https://api.lorem.space/image/face?hash=33791">
             </div> -->
-            <a href="/src/alpine/profile.html" class="btn btn-sm">Profile</a>
+            <template x-data x-if="$store.authentication.isAuthenticated">
+                <a href="/src/alpine/profile.html" class="btn btn-sm">Profile</a>
+            </template>
+            <template x-data x-if="!$store.authentication.isAuthenticated">
+                <a href="#" class="btn btn-sm">Create Account</a>
+            </template>
             <label class="ml-5 swap swap-rotate">
                 <!-- this hidden checkbox controls the state -->
-                <input type="checkbox"/>
+                <input type="checkbox" />
                 <!-- sun icon -->
-                <svg class="swap-off fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z"/></svg>
+                <svg class="swap-off fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
+                </svg>
                 <!-- moon icon -->
-                <svg class="swap-on fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z"/></svg>
-              </label>
+                <svg class="swap-on fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                    <path
+                        d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
+                </svg>
+            </label>
         </div>
     </div>
 
     <!--SEARCHBAR-->
     <div class="form-control mt-3 ml-14 lg:ml-52">
-        <div class="input-group justify-start lg:justify-start">
-            <input type="text" placeholder="Search your bookmarks…" class="input input-bordered focus:outline-none w-3/4 lg:w-1/2">
-            <button class="btn btn-square">
+        <div class="input-group justify-start lg:justify-start" x-data>
+            <input type="text" placeholder="Search your bookmarks…"
+                class="input input-bordered focus:outline-none w-3/4 lg:w-1/2" @keyup.enter="$store.personalResults.resett()">
+            <button class="btn btn-square" @click="$store.personalResults.resett()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -84,62 +96,38 @@
     </div>
 
     <!--USER DATA - MOBILE-->
-    <div class="flex flex-col ml-16 mt-5 items-start lg:hidden">
-        <div class="flex items-center pt-3 pb-1">
-            <div class="avatar pr-2">
-                <div class="w-8 rounded-full">
-                    <img src="https://api.lorem.space/image/face?hash=92310">
+    <template x-data x-if="$store.authentication.isAuthenticated">
+        <div class="flex flex-col ml-16 mt-5 items-start lg:hidden">
+            <div class="flex items-center pt-3 pb-1">
+                <div class="avatar pr-2">
+                    <div class="w-8 rounded-full">
+                        <img src="https://api.lorem.space/image/face?hash=92310">
+                    </div>
                 </div>
+                <h2 class="card-title pr-5">Wei Dailey</h2>
+                <button class="btn btn-xs btn-primary">+ Add to list</button>
             </div>
-            <h2 class="card-title pr-5">Wei Dailey</h2>
-            <button class="btn btn-xs btn-primary">+ Add to list</button>
+            <p class="mb-4 text-xs ml-10 mr-14">Wei Dailey does some cool stuff. A developer by day, shitposter by night,
+                and a Bitcoiner for life.</p>
         </div>
-        <p class="mb-4 text-xs ml-10 mr-14">Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.</p>
-    </div>
+    </template>
 
     <!--RESULTS + CARDS CONTAINER-->
     <div>
         <div class="flex ml-14 lg:ml-4">
-            <div class="w-3/4 lg:w-5/6 flex flex-col mt-5">
-                <div class="lg:ml-52 mt-5 max-w-xl">
-                    <h1><a class="link link-primary text-xl">I'm a simple link</a></h1>
-                    <p class="text-xs text-accent-focus pt-1">8 days ago</p>
-                    <p class="text-md pt-1">If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes
-                        does he choose? If a dog chews shoes whose shoes does he choose?</p>
-                    <p class="text-xs font-bold pt-1 pl-2">- John Smith, medium.com</p>
-                </div>
+            <div class="w-3/4 lg:w-5/6 flex flex-col mt-5" x-data>
+                <template x-for="result in $store.personalResults.results">
+                    <div class="lg:ml-52 mt-5 max-w-xl">
+                        <h1><a class="link link-primary text-xl" x-text="result.title">I'm a simple link</a></h1>
+                        <p class="text-xs text-accent-focus pt-1" x-text="result.timestamp">8 days ago</p>
+                        <p class="text-md pt-1" x-text="result.description">If a dog chews shoes whose shoes does he choose? If a dog chews shoes
+                            whose
+                            shoes
+                            does he choose? If a dog chews shoes whose shoes does he choose?</p>
+                        <p class="text-xs font-bold pt-1 pl-2"  x-text="'- ' + result.author + ', ' + result.website">- John Smith, medium.com</p>
+                    </div>
+                </template>
 
-                <div class="lg:ml-52 mt-5 max-w-xl">
-                    <h1><a class="link link-primary text-xl">I'm a simple link</a></h1>
-                    <p class="text-xs text-accent-focus pt-1">8 days ago</p>
-                    <p class="text-md pt-1">If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes
-                        does he choose? If a dog chews shoes whose shoes does he choose?</p>
-                    <p class="text-xs font-bold pt-1 pl-2">- John Smith, medium.com</p>
-                </div>
-
-                <div class="lg:ml-52 mt-5 max-w-xl">
-                    <h1><a class="link link-primary text-xl">I'm a simple link</a></h1>
-                    <p class="text-xs text-accent-focus pt-1">8 days ago</p>
-                    <p class="text-md pt-1">If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes
-                        does he choose? If a dog chews shoes whose shoes does he choose?</p>
-                    <p class="text-xs font-bold pt-1 pl-2">- John Smith, medium.com</p>
-                </div>
-
-                <div class="lg:ml-52 mt-5 max-w-xl">
-                    <h1><a class="link link-primary text-xl">I'm a simple link</a></h1>
-                    <p class="text-xs text-accent-focus pt-1">8 days ago</p>
-                    <p class="text-md pt-1">If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes
-                        does he choose? If a dog chews shoes whose shoes does he choose?</p>
-                    <p class="text-xs font-bold pt-1 pl-2">- John Smith, medium.com</p>
-                </div>
-
-                <div class="lg:ml-52 mt-5 max-w-xl">
-                    <h1><a class="link link-primary text-xl">I'm a simple link</a></h1>
-                    <p class="text-xs text-accent-focus pt-1">8 days ago</p>
-                    <p class="text-md pt-1">If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes
-                        does he choose? If a dog chews shoes whose shoes does he choose?</p>
-                    <p class="text-xs font-bold pt-1 pl-2">- John Smith, medium.com</p>
-                </div>
 
                 <div class="flex lg:ml-52 mt-14 mb-20 items-center">
                     <p class="text-sm text-base-content mr-2">See more:</p>
@@ -155,35 +143,40 @@
 
 
             <div class="hidden lg:block mt-16 ml-24">
-                <div class="card w-4/6 bg-base-100 shadow-xl border">
-                    <div class="card-body">
-                        <div>
-                            <div class="avatar">
-                                <div class="w-16 rounded-full">
-                                    <img src="https://api.lorem.space/image/face?hash=92310">
+                <template x-data x-if="$store.authentication.isAuthenticated">
+                    <div class="card w-4/6 bg-base-100 shadow-xl border">
+                        <div class="card-body">
+                            <div>
+                                <div class="avatar">
+                                    <div class="w-16 rounded-full">
+                                        <img src="https://api.lorem.space/image/face?hash=92310">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="flex items-center pt-3 pb-1">
-                                <h2 class="card-title pr-5">Wei Dailey</h2>
-                                <button class="btn btn-xs btn-primary">+ Add to list</button>
-                            </div>
-                            <div class="rating pb-3">
-                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
-                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked>
-                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
-                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
-                                <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
-                              </div>
-                            <p class="mb-4">Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.</p>
-                            <p class="mb-1 text-xs text-primary">Share this bookmark:</p>
-                            <div class="w-4/6 broder items-center bg-gray-300 rounded mb-10 items-center">
-                                <input type="text" value="https://x.aquila.network/gFDgdggd646FfhdJ6Tvh" class="w-4/6 pl-3 text-gray-500 text-xs bg-gray-300">
-                                <button class="cursor-pointer border shadow bg-gray-100 text-xs rounded-full px-2" onclick="">copy</button>
-                              </div>
-                            <a class="link link-primary text-xs">send us your feedback 🗣️📣</a>
+                                <div class="flex items-center pt-3 pb-1">
+                                    <h2 class="card-title pr-5">Wei Dailey</h2>
+                                    <button class="btn btn-xs btn-primary">+ Add to list</button>
+                                </div>
+                                <div class="rating pb-3">
+                                    <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
+                                    <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked>
+                                    <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
+                                    <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
+                                    <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
+                                </div>
+                                <p class="mb-4">Wei Dailey does some cool stuff. A developer by day, shitposter by night,
+                                    and a Bitcoiner for life.</p>
+                                <p class="mb-1 text-xs text-primary">Share this bookmark:</p>
+                                <div class="w-4/6 broder items-center bg-gray-300 rounded mb-10 items-center">
+                                    <input type="text" value="https://x.aquila.network/gFDgdggd646FfhdJ6Tvh"
+                                        class="w-4/6 pl-3 text-gray-500 text-xs bg-gray-300">
+                                    <button class="cursor-pointer border shadow bg-gray-100 text-xs rounded-full px-2"
+                                        onclick="">copy</button>
+                                </div>
+                                <a class="link link-primary text-xs">send us your feedback 🗣️📣</a>
 
+                            </div>
                         </div>
-                    </div>
+                    </template>
                 </div>
             </div>
         </div>
@@ -222,7 +215,9 @@
             </div>
         </footer>
 
-        <script src="https://cdn.tailwindcss.com" async defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/spruce@2.x.x/dist/spruce.umd.js"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="/src/alpine/main.js"></script>
 </body>
 
 </html>
