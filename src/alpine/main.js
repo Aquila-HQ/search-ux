@@ -1,4 +1,4 @@
-console.log("Welcome to Aquila Network")
+console.log("Welcome to Aquila Network! Nothing interesting is here to see. \nMaybe https://docs.aquila.network might interest you.")
 
 // Tailwind configurations
 tailwind.config = {
@@ -215,7 +215,7 @@ function searchAPI (host, publicID, query, page, noItems) {
 
 }
 
-function correct (host, secretKey, query, url, itemID) {
+function correctAPI (host, secretKey, query, url, itemID) {
 
 }
 
