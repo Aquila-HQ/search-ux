@@ -11,6 +11,9 @@ tailwind.config = {
     }
 }
 
+// globals
+const chromeExtensionID = "albdahjdcmldbcpjmbnbcbckgndaibnk"
+
 // Alpine initialized succesfully
 document.addEventListener('alpine:init', () => {
     // Initialize all Alpine datastructures (Alpine Store)
@@ -27,7 +30,43 @@ window.onload = function () {
     Alpine.store('urlParams').loadURLParams()
     // initialize user by performing authentication on load
     Alpine.store('authentication').authenticate()
-    Alpine.store('authentication').loadUserInfo()
+
+    /* 
+    Behaviour of results on first page loading. 
+    Cases:
+    1. is a Personal URL
+         1.a. without search query
+         1.b. with search query
+    2. is a Public URL
+         1.a. without search query
+         1.b. with search query 
+    */
+    if (Alpine.store('urlParams').shareID == null) {
+        if (Alpine.store('urlParams').queryText == null) {
+            // list items for page 1
+            Alpine.store('listedResults').nextPage = 2
+            nr = Alpine.store('listedResults').resultsPerPage
+            Alpine.store('listedResults').results = listPrivateAPI("", 1, nr)
+        } else {
+            // search items for page 1
+            Alpine.store('listedResults').nextPage = 2
+            nr = Alpine.store('listedResults').resultsPerPage
+            Alpine.store('listedResults').results = searchPrivateAPI("", Alpine.store('urlParams').queryText, 1, nr)
+        }
+    } else {
+        if (Alpine.store('urlParams').queryText == null) {
+            // list items for page 1
+            Alpine.store('listedResults').nextPage = 2
+            nr = Alpine.store('listedResults').resultsPerPage
+            Alpine.store('listedResults').results = listPublicAPI("", 1, nr)
+        } else {
+            // search items for page 1
+            Alpine.store('listedResults').nextPage = 2
+            nr = Alpine.store('listedResults').resultsPerPage
+            Alpine.store('listedResults').results = searchPublicAPI("", Alpine.store('urlParams').queryText, 1, nr)
+        }
+    }
+
 
 }
 
@@ -66,21 +105,25 @@ function initAuthentication() {
         authenticate() {
 
             // get secret key from addon
-
-            // get authentication status from API
-            this.isAuthenticated = !this.isAuthenticated
+            addonData = fetchSecretADDON()
+            if (addonData.secretKey == null) {
+                this.isAuthenticated = false
+            } else {
+                // get authentication status from API
+                AuthenticateAPI(addonData.host, addonData.secretKey)
+                    .then(result => {
+                        this.isAuthenticated = result
+                        Alpine.store('authentication').loadUserInfo()
+                    })
+            }
         },
         isAuthenticated: false,
         loadUserInfo() {
             // get user information from API
+            fetchUserAPI(addonData.host, addonData.secretKey)
+                .then(result => console.log(result))
         },
-        user: {
-            name: "Wei Dailey",
-            rating: 4,
-            avatar: "https://api.lorem.space/image/face?hash=92310",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "sd231sd2sdss412sd342s3s52s35fsdtgsdg"
-        }
+        user: null
     })
 }
 
@@ -89,14 +132,8 @@ function initProfileInformation() {
     Alpine.store('profileInfo', {
         get(shareID) {
             // call API to get data for a profile with ShareID
-            
-            return {
-                name: "Wei Dailey",
-                rating: 4,
-                avatar: "https://api.lorem.space/image/face?hash=92310",
-                description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-                publicURL: "sd231sd2sdss412sd342s3s52s35fsdtgsdg"
-            }
+
+            return fetchProfileAPI("", "")
         }
     })
 }
@@ -109,114 +146,223 @@ function initSearchInput() {
 }
 
 function initSearchResults() {
-    // configure & cache search results for a personal search, public search & aggregated search separately
-    Alpine.store('personalResults', {
+    // configure & cache search results for a personal/public search & aggregated search separately
+    Alpine.store('listedResults', {
         resett() {
             this.results = []
         },
-        results: [
-            {
-                title: "I'm a simple link title 1",
-                url: "https://google.com",
-                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                timestamp: 123456789,
-                author: "John Smith",
-                website: "medium.com"
-            },
-            {
-                title: "I'm a simple link title 2",
-                url: "https://google.com",
-                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                timestamp: 123456789,
-                author: "John Smith",
-                website: "medium.com"
-            }
-        ],
+        results: [],
         resultsPerPage: 10,
-        currentPage: 1
-    })
-
-    Alpine.store('publicResults', {
-        resett() {
-            this.results = []
-        },
-        results: [
-            {
-                title: "I'm a simple link title 1",
-                url: "https://google.com",
-                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                timestamp: 123456789,
-                author: "John Smith",
-                website: "medium.com"
-            },
-            {
-                title: "I'm a simple link title 2",
-                url: "https://google.com",
-                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                timestamp: 123456789,
-                author: "John Smith",
-                website: "medium.com"
-            }
-        ],
-        resultsPerPage: 10,
-        currentPage: 1
+        nextPage: 1
     })
 
     Alpine.store('mixedResults', {
         resett() {
             this.results = []
         },
-        results: [
-            {
-                title: "I'm a simple link title 1",
-                url: "https://google.com",
-                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                timestamp: 123456789,
-                author: "John Smith",
-                website: "medium.com"
-            },
-            {
-                title: "I'm a simple link title 2",
-                url: "https://google.com",
-                description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-                timestamp: 123456789,
-                author: "John Smith",
-                website: "medium.com"
-            }
-        ],
+        results: [],
         resultsPerPage: 10,
-        currentPage: 1
+        nextPage: 1
     })
 }
 
 // ----------------------------------- 2) API calls to addon / server -----------------------------------------
 
-function fetchSecretADDON (addonKey) {
+function fetchSecretADDON() {
+    secretKey = null
 
+    try {
+        if (chrome && chrome.runtime) {
+            chrome.runtime.sendMessage(chromeExtensionID, {},
+                function (response) {
+                    if (response && response.success) {
+                        secretKey = response.key
+                    }
+                    else {
+                        secretKey = localStorage.getItem("axapi")
+                    }
+                }
+            )
+        }
+        else {
+            secretKey = localStorage.getItem("axapi")
+        }
+    }
+    catch (e) {
+        secretKey = localStorage.getItem("axapi")
+    }
+
+    return {
+        host: "https://x.aquila.network",
+        secretKey: "SR5Akwx21626763430" // secretKey // TBD: change later
+    }
 }
 
-function AuthenticateAPI (host, secretKey) {
+async function AuthenticateAPI(host, secretKey) {
+    let myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
 
+    let raw = JSON.stringify({
+        "key": secretKey
+    })
+
+    let requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/user", requestOptions)
+        .catch((error) => {
+
+        })
+
+    if (response) {
+        return response.ok
+    } else {
+        return false
+    }
 }
 
-function fetchUserAPI (host, secretKey) {
+async function fetchUserAPI(host, secretKey) {
+    let myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
 
+    let raw = JSON.stringify({
+        "key": secretKey
+    })
+
+    let requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/user", requestOptions)
+        .then((response) => response.json())
+        .catch((error) => {
+
+        })
+
+    if (response) {
+        return {
+            name: response.user[0].name,
+            rating: 4,
+            avatar: "https://api.lorem.space/image/face?hash=92310",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.", // response.user[0].title // TODO
+            publicURL: "sd231sd2sdss412sd342s3s52s35fsdtgsdg"
+        }
+    } else {
+        return false
+    }
+
+    return {
+        name: "May Jonnes",
+        rating: 4,
+        avatar: "https://api.lorem.space/image/face?hash=92310",
+        description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+        publicURL: "sd231sd2sdss412sd342s3s52s35fsdtgsdg"
+    }
 }
 
-function fetchProfileAPI (host, publicID) {
-
+function fetchProfileAPI(host, publicID) {
+    return {
+        name: "Wei Dailey",
+        rating: 4,
+        avatar: "https://api.lorem.space/image/face?hash=92310",
+        description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+        publicURL: "sd231sd2sdss412sd342s3s52s35fsdtgsdg"
+    }
 }
 
-function listAPI (host, publicID, page, noItems) {
-
+function listPrivateAPI(host, page, noItems) {
+    return [
+        {
+            title: "I'm a simple private list title 1",
+            url: "https://google.com",
+            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+            timestamp: 123456789,
+            author: "John Smith",
+            website: "medium.com"
+        },
+        {
+            title: "I'm a simple private list title 2",
+            url: "https://google.com",
+            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+            timestamp: 123456789,
+            author: "John Smith",
+            website: "medium.com"
+        }
+    ]
 }
 
-function searchAPI (host, publicID, query, page, noItems) {
-
+function searchPrivateAPI(host, query, page, noItems) {
+    return [
+        {
+            title: "I'm a simple private search title 1",
+            url: "https://google.com",
+            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+            timestamp: 123456789,
+            author: "John Smith",
+            website: "medium.com"
+        },
+        {
+            title: "I'm a simple private search title 2",
+            url: "https://google.com",
+            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+            timestamp: 123456789,
+            author: "John Smith",
+            website: "medium.com"
+        }
+    ]
 }
 
-function correctAPI (host, secretKey, query, url, itemID) {
+function listPublicAPI(host, publicID, page, noItems) {
+    return [
+        {
+            title: "I'm a simple public list title 1",
+            url: "https://google.com",
+            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+            timestamp: 123456789,
+            author: "John Smith",
+            website: "medium.com"
+        },
+        {
+            title: "I'm a simple public list title 2",
+            url: "https://google.com",
+            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+            timestamp: 123456789,
+            author: "John Smith",
+            website: "medium.com"
+        }
+    ]
+}
 
+function searchPublicAPI(host, publicID, query, page, noItems) {
+    return [
+        {
+            title: "I'm a simple public search title 1",
+            url: "https://google.com",
+            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+            timestamp: 123456789,
+            author: "John Smith",
+            website: "medium.com"
+        },
+        {
+            title: "I'm a simple public search title 2",
+            url: "https://google.com",
+            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
+            timestamp: 123456789,
+            author: "John Smith",
+            website: "medium.com"
+        }
+    ]
+}
+
+function correctAPI(host, secretKey, query, url, itemID) {
+    return true
 }
 
 // ----------------------------------- 3) Event listeners & actions -----------------------------------------

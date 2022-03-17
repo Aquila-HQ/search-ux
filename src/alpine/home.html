@@ -83,9 +83,9 @@
     <!--SEARCHBAR-->
     <div class="form-control mt-3 ml-14 lg:ml-52">
         <div class="input-group justify-start lg:justify-start" x-data>
-            <input type="text" placeholder="Search your bookmarks…"
-                class="input input-bordered focus:outline-none w-3/4 lg:w-1/2" @keyup.enter="$store.personalResults.resett()">
-            <button class="btn btn-square" @click="$store.personalResults.resett()">
+            <input type="text" placeholder="Search bookmarks…"
+                class="input input-bordered focus:outline-none w-3/4 lg:w-1/2" x-model="$store.urlParams.queryText" @keyup.enter="$store.listedResults.resett()">
+            <button class="btn btn-square" @click="$store.listedResults.resett()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -116,7 +116,7 @@
     <div>
         <div class="flex ml-14 lg:ml-4">
             <div class="w-3/4 lg:w-5/6 flex flex-col mt-5" x-data>
-                <template x-for="result in $store.personalResults.results">
+                <template x-for="result in $store.listedResults.results">
                     <div class="lg:ml-52 mt-5 max-w-xl">
                         <h1><a class="link link-primary text-xl" x-text="result.title">I'm a simple link</a></h1>
                         <p class="text-xs text-accent-focus pt-1" x-text="result.timestamp">8 days ago</p>
