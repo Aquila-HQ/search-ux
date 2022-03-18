@@ -14,6 +14,8 @@ tailwind.config = {
 // globals
 const chromeExtensionID = "albdahjdcmldbcpjmbnbcbckgndaibnk"
 
+// TODO: reload on history travel
+
 // Alpine initialized succesfully
 document.addEventListener('alpine:init', () => {
     // Initialize all Alpine datastructures (Alpine Store)
@@ -30,42 +32,13 @@ window.onload = function () {
     Alpine.store('urlParams').loadURLParams()
     // initialize user by performing authentication on load
     Alpine.store('authentication').authenticate()
-
-    /* 
-    Behaviour of results on first page loading. 
-    Cases:
-    1. is a Personal URL
-         1.a. without search query
-         1.b. with search query
-    2. is a Public URL
-         1.a. without search query
-         1.b. with search query 
-    */
-    if (Alpine.store('urlParams').shareID == null) {
-        if (Alpine.store('urlParams').queryText == null) {
-            // list items for page 1
-            Alpine.store('listedResults').nextPage = 2
-            nr = Alpine.store('listedResults').resultsPerPage
-            Alpine.store('listedResults').results = listPrivateAPI("", 1, nr)
-        } else {
-            // search items for page 1
-            Alpine.store('listedResults').nextPage = 2
-            nr = Alpine.store('listedResults').resultsPerPage
-            Alpine.store('listedResults').results = searchPrivateAPI("", Alpine.store('urlParams').queryText, 1, nr)
-        }
-    } else {
-        if (Alpine.store('urlParams').queryText == null) {
-            // list items for page 1
-            Alpine.store('listedResults').nextPage = 2
-            nr = Alpine.store('listedResults').resultsPerPage
-            Alpine.store('listedResults').results = listPublicAPI("", 1, nr)
-        } else {
-            // search items for page 1
-            Alpine.store('listedResults').nextPage = 2
-            nr = Alpine.store('listedResults').resultsPerPage
-            Alpine.store('listedResults').results = searchPublicAPI("", Alpine.store('urlParams').queryText, 1, nr)
-        }
+    // load profile, if share URL param is given
+    if (Alpine.store('urlParams').shareID != null) {
+        Alpine.store('profileInfo').loadProfileInfo(Alpine.store('authentication').host, Alpine.store('urlParams').shareID)
     }
+
+    // Fill search/List content accordingly
+    fillSLContentAction()
 
 
 }
@@ -106,6 +79,11 @@ function initAuthentication() {
 
             // get secret key from addon
             addonData = fetchSecretADDON()
+
+            // update host, secret
+            this.host = addonData.host
+            this.secretKey = addonData.secretKey
+
             if (addonData.secretKey == null) {
                 this.isAuthenticated = false
             } else {
@@ -121,20 +99,34 @@ function initAuthentication() {
         loadUserInfo() {
             // get user information from API
             fetchUserAPI(addonData.host, addonData.secretKey)
-                .then(result => console.log(result))
+                .then(result => {
+                    this.user = result
+                    // update profile info to user info, if no share URL is given
+                    if (Alpine.store('urlParams').shareID == null) {
+                        Alpine.store('profileInfo').profile = this.user
+                    }
+                })
         },
-        user: null
+        user: null,
+        host: null,
+        secretKey: null
     })
 }
 
 function initProfileInformation() {
     // Get profile information for any public profile given the ID
     Alpine.store('profileInfo', {
-        get(shareID) {
+        loadProfileInfo(host, shareID) {
             // call API to get data for a profile with ShareID
 
-            return fetchProfileAPI("", "")
-        }
+            fetchProfileAPI(host, shareID)
+                .then(result => {
+                    if (result) {
+                        this.profile = result
+                    }
+                })
+        },
+        profile: null
     })
 }
 
@@ -240,10 +232,85 @@ async function fetchUserAPI(host, secretKey) {
         redirect: 'follow'
     }
 
-    let response = await fetch(host + "/api/user", requestOptions)
-        .then((response) => response.json())
+    let userResponse = await fetch(host + "/api/user", requestOptions)
+        .then((userResponse) => userResponse.json())
         .catch((error) => {
+            return null
+        })
 
+    if (userResponse) {
+        let pubResponse = await getPublicURLAPI(host, secretKey)
+            .then((result) => result)
+
+        if (pubResponse) {
+            let publicIDTemp = null
+            if (pubResponse.isActive) {
+                publicIDTemp = pubResponse.id
+            }
+
+            return {
+                name: userResponse.user[0].name,
+                rating: 4,
+                avatar: "https://api.lorem.space/image/face?hash=92310",
+                description: userResponse.user[0].title,
+                publicURL: publicIDTemp
+            }
+        } else {
+            return null
+        }
+
+    } else {
+        return null
+    }
+}
+
+async function getPublicURLAPI(host, secretKey) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "key": secretKey
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/url/public", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return null
+        })
+
+    if (response) {
+        return response.publicIndexId[0]
+    } else {
+        return null
+    }
+}
+
+async function fetchProfileAPI(host, publicID) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "publicIndexId": publicID
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/user", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return null
         })
 
     if (response) {
@@ -251,118 +318,381 @@ async function fetchUserAPI(host, secretKey) {
             name: response.user[0].name,
             rating: 4,
             avatar: "https://api.lorem.space/image/face?hash=92310",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.", // response.user[0].title // TODO
-            publicURL: "sd231sd2sdss412sd342s3s52s35fsdtgsdg"
+            description: response.user[0].title,
+            publicURL: publicID
         }
     } else {
-        return false
-    }
-
-    return {
-        name: "May Jonnes",
-        rating: 4,
-        avatar: "https://api.lorem.space/image/face?hash=92310",
-        description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-        publicURL: "sd231sd2sdss412sd342s3s52s35fsdtgsdg"
+        return null
     }
 }
 
-function fetchProfileAPI(host, publicID) {
-    return {
-        name: "Wei Dailey",
-        rating: 4,
-        avatar: "https://api.lorem.space/image/face?hash=92310",
-        description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-        publicURL: "sd231sd2sdss412sd342s3s52s35fsdtgsdg"
+async function listPrivateAPI(host, secretKey, page, noItems) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "page": page,
+        "key": secretKey,
+        "limit": noItems
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/list", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return []
+        })
+
+    if (response) {
+        let urls = response.result.links.map(({ url }) => url)
+        // fetch url summary
+        let sumResponse = await URLSummaryPrivateAPI(host, secretKey, urls)
+            .then((result) => result)
+
+        let retTmp = []
+
+        var i = 0, len = sumResponse.length;
+        while (i < len) {
+            retTmp.push({
+                title: sumResponse[i].title,
+                url: sumResponse[i].url,
+                description: sumResponse[i].summary,
+                timestamp: moment((new Date(response.result.links[i].timestamp * 1000))).fromNow(),
+                author: sumResponse[i].author,
+                website: (new URL(sumResponse[i].url)).hostname
+            })
+
+            i++
+        }
+
+        return retTmp
+    } else {
+        return []
     }
 }
 
-function listPrivateAPI(host, page, noItems) {
-    return [
-        {
-            title: "I'm a simple private list title 1",
-            url: "https://google.com",
-            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-            timestamp: 123456789,
-            author: "John Smith",
-            website: "medium.com"
-        },
-        {
-            title: "I'm a simple private list title 2",
-            url: "https://google.com",
-            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-            timestamp: 123456789,
-            author: "John Smith",
-            website: "medium.com"
+async function searchPrivateAPI(host, secretKey, query, page, noItems) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "key": secretKey,
+        "query": query
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/search", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return []
+        })
+
+    if (response) {
+        // sort results
+        let sortedResults = Object.entries(response.result)
+            .sort(([, a], [, b]) => b - a)
+            .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+
+        let urls = Object.keys(sortedResults)
+        // fetch url summary
+        let sumResponse = await URLSummaryPrivateAPI(host, secretKey, urls)
+            .then((result) => result)
+
+        let retTmp = []
+
+        var i = 0, len = sumResponse.length;
+        while (i < len) {
+            retTmp.push({
+                title: sumResponse[i].title,
+                url: sumResponse[i].url,
+                description: sumResponse[i].summary,
+                timestamp: null,
+                author: sumResponse[i].author,
+                website: (new URL(sumResponse[i].url)).hostname
+            })
+
+            i++
         }
-    ]
+
+        return retTmp
+    } else {
+        return []
+    }
 }
 
-function searchPrivateAPI(host, query, page, noItems) {
-    return [
-        {
-            title: "I'm a simple private search title 1",
-            url: "https://google.com",
-            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-            timestamp: 123456789,
-            author: "John Smith",
-            website: "medium.com"
-        },
-        {
-            title: "I'm a simple private search title 2",
-            url: "https://google.com",
-            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-            timestamp: 123456789,
-            author: "John Smith",
-            website: "medium.com"
-        }
-    ]
+async function URLSummaryPrivateAPI(host, secretKey, urls) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "key": secretKey,
+        "urls": urls
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/urlsummary", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return null
+        })
+
+    if (response) {
+        return response.result.summary
+    } else {
+        return null
+    }
 }
 
-function listPublicAPI(host, publicID, page, noItems) {
-    return [
-        {
-            title: "I'm a simple public list title 1",
-            url: "https://google.com",
-            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-            timestamp: 123456789,
-            author: "John Smith",
-            website: "medium.com"
-        },
-        {
-            title: "I'm a simple public list title 2",
-            url: "https://google.com",
-            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-            timestamp: 123456789,
-            author: "John Smith",
-            website: "medium.com"
+async function listPublicAPI(host, publicID, page, noItems) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "page": page,
+        "publicIndexId": publicID,
+        "limit": noItems
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/list", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return []
+        })
+
+    if (response) {
+        let urls = response.result.links.map(({ url }) => url)
+        // fetch url summary
+        let sumResponse = await URLSummaryPublicAPI(host, publicID, urls)
+            .then((result) => result)
+
+        let retTmp = []
+
+        var i = 0, len = sumResponse.length;
+        while (i < len) {
+            retTmp.push({
+                title: sumResponse[i].title,
+                url: sumResponse[i].url,
+                description: sumResponse[i].summary,
+                timestamp: moment((new Date(response.result.links[i].timestamp * 1000))).fromNow(),
+                author: sumResponse[i].author,
+                website: (new URL(sumResponse[i].url)).hostname
+            })
+
+            i++
         }
-    ]
+
+        return retTmp
+    } else {
+        return []
+    }
 }
 
-function searchPublicAPI(host, publicID, query, page, noItems) {
-    return [
-        {
-            title: "I'm a simple public search title 1",
-            url: "https://google.com",
-            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-            timestamp: 123456789,
-            author: "John Smith",
-            website: "medium.com"
-        },
-        {
-            title: "I'm a simple public search title 2",
-            url: "https://google.com",
-            description: "If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose? If a dog chews shoes whose shoes does he choose?",
-            timestamp: 123456789,
-            author: "John Smith",
-            website: "medium.com"
+async function searchPublicAPI(host, publicID, query, page, noItems) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "publicIndexId": publicID,
+        "query": query
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/search", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return []
+        })
+
+    if (response) {
+        // sort results
+        let sortedResults = Object.entries(response.result)
+            .sort(([, a], [, b]) => b - a)
+            .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+
+        let urls = Object.keys(sortedResults)
+        // fetch url summary
+        let sumResponse = await URLSummaryPublicAPI(host, publicID, urls)
+            .then((result) => result)
+
+        let retTmp = []
+
+        var i = 0, len = sumResponse.length;
+        while (i < len) {
+            retTmp.push({
+                title: sumResponse[i].title,
+                url: sumResponse[i].url,
+                description: sumResponse[i].summary,
+                timestamp: null,
+                author: sumResponse[i].author,
+                website: (new URL(sumResponse[i].url)).hostname
+            })
+
+            i++
         }
-    ]
+
+        return retTmp
+    } else {
+        return []
+    }
+}
+
+async function URLSummaryPublicAPI(host, publicID, urls) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "publicIndexId": publicID,
+        "urls": urls
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/urlsummary", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return null
+        })
+
+    if (response) {
+        return response.result.summary
+    } else {
+        return null
+    }
 }
 
 function correctAPI(host, secretKey, query, url, itemID) {
     return true
 }
 
-// ----------------------------------- 3) Event listeners & actions -----------------------------------------
+// ----------------------------------- 3) Event listeners ----------------------------------------- 
+
+// Listen to search input content change
+// User searched
+function onUserSearchedEvent() {
+    Alpine.store('listedResults').resett()
+
+    // update url history
+    let searchQuery = Alpine.store('urlParams').queryText
+    if (searchQuery) {
+
+        window.history.pushState('', '', window.location.href.split('?')[0] + '?q=' + searchQuery.replace(/ +(?= )/g, '').split(" ").join("+"));
+        if (Alpine.store('urlParams').shareID != null) {
+            window.history.pushState('', '', window.location.href.split('?')[0] + '?q=' + searchQuery.replace(/ +(?= )/g, '').split(" ").join("+") + '&share=' + Alpine.store('urlParams').shareID);
+        }
+    }
+
+    fillSLContentAction()
+}
+
+// ----------------------------------- 4) Actions -----------------------------------------
+
+// Fill in search/list content
+function fillSLContentAction() {
+    /* 
+    Behaviour of results on first page loading. 
+    Cases:
+    1. is a Personal URL
+         1.a. without search query
+         1.b. with search query
+    2. is a Public URL
+         1.a. without search query
+         1.b. with search query 
+    */
+    if (Alpine.store('urlParams').shareID == null) {
+        if (!Alpine.store('urlParams').queryText) {
+            // list items
+            performListAction(Alpine.store('authentication').host, Alpine.store('authentication').secretKey, Alpine.store('urlParams').shareID)
+        } else {
+            // search items
+            performSearchAction(Alpine.store('authentication').host, Alpine.store('authentication').secretKey, Alpine.store('urlParams').queryText, Alpine.store('urlParams').shareID)
+        }
+    } else {
+        if (!Alpine.store('urlParams').queryText) {
+            // list items
+            performListAction(Alpine.store('authentication').host, Alpine.store('urlParams').shareID, Alpine.store('urlParams').shareID)
+        } else {
+            // search items
+            performSearchAction(Alpine.store('authentication').host, Alpine.store('urlParams').shareID, Alpine.store('urlParams').queryText, Alpine.store('urlParams').shareID)
+        }
+    }
+}
+
+// Search items
+function performSearchAction(host, key, query, isPublic) {
+    // change title
+    document.title = query + " - Aquila Search"
+
+    // manage paging
+    Alpine.store('listedResults').nextPage = 2
+    nr = Alpine.store('listedResults').resultsPerPage
+
+    if (isPublic) {
+        searchPublicAPI(host, key, query, 1, nr)
+            .then(result => {
+                Alpine.store('listedResults').results = result
+            })
+    } else {
+        searchPrivateAPI(host, key, query, 1, nr)
+            .then(result => {
+                Alpine.store('listedResults').results = result
+            })
+    }
+}
+
+// List items
+function performListAction(host, key, isPublic) {
+    // change title
+    document.title = "Aquila | Search Bookmarks..."
+
+    // manage paging
+    Alpine.store('listedResults').nextPage = 2
+    nr = Alpine.store('listedResults').resultsPerPage
+
+    if (isPublic) {
+        listPublicAPI(host, key, 1, nr)
+            .then(result => {
+                Alpine.store('listedResults').results = result
+            })
+    } else {
+        listPrivateAPI(host, key, 1, nr)
+            .then(result => {
+                Alpine.store('listedResults').results = result
+            })
+    }
+}

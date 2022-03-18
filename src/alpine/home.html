@@ -84,8 +84,8 @@
     <div class="form-control mt-3 ml-14 lg:ml-52">
         <div class="input-group justify-start lg:justify-start" x-data>
             <input type="text" placeholder="Search bookmarks…"
-                class="input input-bordered focus:outline-none w-3/4 lg:w-1/2" x-model="$store.urlParams.queryText" @keyup.enter="$store.listedResults.resett()">
-            <button class="btn btn-square" @click="$store.listedResults.resett()">
+                class="input input-bordered focus:outline-none w-3/4 lg:w-1/2" x-model="$store.urlParams.queryText" @keyup.enter="onUserSearchedEvent()">
+            <button class="btn btn-square" @click="onUserSearchedEvent()">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -153,21 +153,20 @@
                                     </div>
                                 </div>
                                 <div class="flex items-center pt-3 pb-1">
-                                    <h2 class="card-title pr-5">Wei Dailey</h2>
+                                    <h2 class="card-title pr-5" x-text="$store.profileInfo.profile.name">Wei Dailey</h2>
                                     <button class="btn btn-xs btn-primary">+ Add to list</button>
                                 </div>
-                                <div class="rating pb-3">
+                                <!-- <div class="rating pb-3">
                                     <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
                                     <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400" checked>
                                     <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
                                     <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
                                     <input type="radio" name="rating-2" class="mask mask-star-2 bg-orange-400">
-                                </div>
-                                <p class="mb-4">Wei Dailey does some cool stuff. A developer by day, shitposter by night,
-                                    and a Bitcoiner for life.</p>
+                                </div> -->
+                                <p class="mb-4" x-text="$store.profileInfo.profile.description"></p>
                                 <p class="mb-1 text-xs text-primary">Share this bookmark:</p>
                                 <div class="w-4/6 broder items-center bg-gray-300 rounded mb-10 items-center">
-                                    <input type="text" value="https://x.aquila.network/gFDgdggd646FfhdJ6Tvh"
+                                    <input type="text" x-model="$store.profileInfo.profile.publicURL"
                                         class="w-4/6 pl-3 text-gray-500 text-xs bg-gray-300">
                                     <button class="cursor-pointer border shadow bg-gray-100 text-xs rounded-full px-2"
                                         onclick="">copy</button>
@@ -217,6 +216,7 @@
 
         <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/spruce@2.x.x/dist/spruce.umd.js"></script>
         <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="/src/alpine/main.js"></script>
 </body>
 
