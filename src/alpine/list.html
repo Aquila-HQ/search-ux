@@ -13,10 +13,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@2.6.1/dist/full.css" rel="stylesheet" type="text/css" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
-
+    <script src="https://unpkg.com/alpinejs" defer></script>
 </head>
 
-<body>
+<body x-init="$store.pageParams.page='list'">
     <!--[if lt IE 7]>
             <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="#">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
@@ -57,7 +57,12 @@
                 <img class="w-10 h-10 mask mask-circle rounded-full"
                     src="https://api.lorem.space/image/face?hash=33791">
             </div> -->
-            <a href="/src/alpine/profile.html" class="btn btn-sm">Profile</a>
+            <template x-if="$store.authentication.isAuthenticated">
+                <a href="/src/alpine/profile.html" class="btn btn-sm">Profile</a>
+            </template>
+            <template x-if="!$store.authentication.isAuthenticated">
+                <a href="#" class="btn btn-sm">Create Account</a>
+            </template>
             <label class="ml-5 swap swap-rotate">
                 <!-- this hidden checkbox controls the state -->
                 <input type="checkbox" />
@@ -365,7 +370,10 @@
         </div>
     </footer>
 
-    <script src="https://cdn.tailwindcss.com" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/spruce@2.x.x/dist/spruce.umd.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js" integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/src/alpine/main.js"></script>
 </body>
 
 </html>

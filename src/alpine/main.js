@@ -19,6 +19,7 @@ const chromeExtensionID = "albdahjdcmldbcpjmbnbcbckgndaibnk"
 // Alpine initialized succesfully
 document.addEventListener('alpine:init', () => {
     // Initialize all Alpine datastructures (Alpine Store)
+    initPageParams()
     initURLParams()
     initAuthentication()
     initProfileInformation()
@@ -37,13 +38,46 @@ window.onload = function () {
         Alpine.store('profileInfo').loadProfileInfo(Alpine.store('authentication').host, Alpine.store('urlParams').shareID)
     }
 
-    // Fill search/List content accordingly
-    fillSLContentAction()
+    // --- HOME page ---
+    if (Alpine.store('pageParams').page == 'home') {
+        // Fill search/List content accordingly
+        fillSLContentAction()
+    }
+
+    // --- EXPLORE page ---
+    if (Alpine.store('pageParams').page == 'explore') {
+        // Fill explore cards accordingly
+        console.log('EXPLORE---------')
+    }
+
+    // --- LIST page ---
+    if (Alpine.store('pageParams').page == 'list') {
+        // Fill mixed search/List content accordingly
+        fillMXContentAction()
+    }
 
 
 }
 
 // ----------------------------- 1) Configure Alpine datastructures --------------------------------------------------
+
+function initPageParams() {
+    // Initialize parameters by to identify current page 
+    Alpine.store('pageParams', {
+        toggleTheme() {
+            // toggle dark mode
+            this.isDarkMode = !this.isDarkMode
+            if (this.isDarkMode) {
+                this.theme = 'dark'
+            } else {
+                this.theme = 'emerald'
+            }
+        },
+        page: null,
+        theme: 'emerald',
+        isDarkMode: false
+    })
+}
 
 function initURLParams() {
     // Initialize by fetching anything that's available in the url parameters for later actions 
@@ -620,6 +654,11 @@ function onUserSearchedEvent() {
     fillSLContentAction()
 }
 
+// Theme toggled
+function onThemeToggleEvent() {
+    Alpine.store('pageParams').toggleTheme()
+}
+
 // ----------------------------------- 4) Actions -----------------------------------------
 
 // Fill in search/list content
@@ -695,4 +734,49 @@ function performListAction(host, key, isPublic) {
                 Alpine.store('listedResults').results = result
             })
     }
+}
+
+// Fill in mixed search/list content
+function fillMXContentAction() {
+    // Allow searching through all subscriptions
+
+    if (!Alpine.store('urlParams').queryText) {
+        // list items
+        performListAction(Alpine.store('authentication').host, Alpine.store('authentication').secretKey)
+    } else {
+        // search items
+        performSearchAction(Alpine.store('authentication').host, Alpine.store('authentication').secretKey, Alpine.store('urlParams').queryText)
+    }
+}
+
+// Search items
+function performMXSearchAction(host, key, query) {
+    // change title
+    document.title = query + " - Aquila List Search"
+
+    // manage paging
+    Alpine.store('listedResults').nextPage = 2
+    nr = Alpine.store('listedResults').resultsPerPage
+
+    searchPrivateAPI(host, key, query, 1, nr)
+        .then(result => {
+            Alpine.store('listedResults').results = result
+        })
+
+}
+
+// List items
+function performMXListAction(host, key) {
+    // change title
+    document.title = "Aquila | Search List..."
+
+    // manage paging
+    Alpine.store('listedResults').nextPage = 2
+    nr = Alpine.store('listedResults').resultsPerPage
+
+    listPrivateAPI(host, key, 1, nr)
+        .then(result => {
+            Alpine.store('listedResults').results = result
+        })
+
 }
