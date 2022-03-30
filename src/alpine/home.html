@@ -107,8 +107,17 @@
                     </div>
                 </div>
                 <h2 class="card-title pr-5" x-text="$store.profileInfo.profile.name"></h2>
-                <button class="btn btn-xs btn-primary" @click="onSubscribeEvent($store.profileInfo.profile.publicURL)">+
-                    Add to list</button>
+                <div x-data="{ uSubed: false }"
+                    x-init="$watch('$store.profileInfo.profile.publicURL', async value => { uSubed = await userIsSubscribedAction(value) } )">
+                    <button class="btn btn-xs btn-primary"
+                        @click="onSubscribeEvent($store.profileInfo.profile.publicURL); uSubed = !uSubed;"
+                        x-show="!uSubed">+
+                        Add to list</button>
+                    <button class="btn btn-xs btn-outline btn-secondary"
+                        @click="onUnSubscribeEvent($store.profileInfo.profile.publicURL); uSubed = !uSubed;"
+                        x-show="uSubed">-
+                        Remove from list</button>
+                </div>
             </div>
             <p class="mb-4 text-xs ml-10 mr-14" x-text="$store.profileInfo.profile.description"></p>
         </div>
@@ -143,7 +152,7 @@
 
 
 
-            <div class="hidden lg:block mt-16 mr-14">
+            <div class="hidden lg:block mt-16 mr-24">
                 <template x-if="$store.authentication.isAuthenticated">
                     <div class="card bg-base-100 shadow-xl border">
                         <div class="card-body">
@@ -155,12 +164,15 @@
                                     </div>
                                 </div>
                                 <h2 class="card-title truncate pb-2" x-text="$store.profileInfo.profile.name"></h2>
-                                <div x-data="{ uSubed: false }" x-init="$watch('$store.profileInfo.profile.publicURL', async value => { uSubed = await userIsSubscribedAction(value) } )">
+                                <div x-data="{ uSubed: false }"
+                                    x-init="$watch('$store.profileInfo.profile.publicURL', async value => { uSubed = await userIsSubscribedAction(value) } )">
                                     <button class="btn btn-xs btn-primary"
-                                        @click="onSubscribeEvent($store.profileInfo.profile.publicURL); uSubed = !uSubed;" x-show="!uSubed">+ Add to
+                                        @click="onSubscribeEvent($store.profileInfo.profile.publicURL); uSubed = !uSubed;"
+                                        x-show="!uSubed">+ Add to
                                         list</button>
                                     <button class="btn btn-xs btn-outline btn-secondary"
-                                        @click="onUnSubscribeEvent($store.profileInfo.profile.publicURL); uSubed = !uSubed;" x-show="uSubed">-
+                                        @click="onUnSubscribeEvent($store.profileInfo.profile.publicURL); uSubed = !uSubed;"
+                                        x-show="uSubed">-
                                         Remove from list</button>
                                 </div>
                                 <!-- <div class="rating pb-3">
@@ -174,12 +186,12 @@
                                 <p class="mb-1 mt-4 text-xs text-primary">Share this bookmark:</p>
                                 <div class="flex broder bg-gray-300 rounded mb-10 p-2">
                                     <input type="text"
-                                        x-model="location.protocol + '//' + location.host + '?share=' + $store.profileInfo.profile.publicURL"
+                                        :value="(location.protocol + '//' + location.host + '?share=' + $store.profileInfo.profile.publicURL)"
                                         class="text-gray-500 text-xs bg-gray-300">
-                                    <button class="cursor-pointer border shadow bg-gray-100 text-xs rounded-full px-2"
-                                        onclick="">copy</button>
+                                    <button x-data="{ copyButtonTitle: 'copy' }" class="cursor-pointer border shadow bg-gray-100 text-xs rounded-full px-2"
+                                        @click="$clipboard(location.protocol + '//' + location.host + '?share=' + $store.profileInfo.profile.publicURL); copyButtonTitle='done'" x-text="copyButtonTitle"></button>
                                 </div>
-                                <a class="link link-primary text-xs">send us your feedback 🗣️📣</a>
+                                <a href="https://airtable.com/shr3QnQbBhWmIKv8p" class="link link-primary text-xs">send us your feedback 🗣️📣</a>
                             </div>
                         </div>
                 </template>

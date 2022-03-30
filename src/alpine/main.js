@@ -23,6 +23,8 @@ document.addEventListener('alpine:init', () => {
     initURLParams()
     initAuthentication()
     initProfileInformation()
+    // magics
+    initClipBoardMagic()
     // home
     initSearchInput()
     initSearchResults()
@@ -168,7 +170,13 @@ function initProfileInformation() {
                     }
                 })
         },
-        profile: null
+        profile: {
+            name: null,
+            rating: null,
+            avatar: null,
+            description: null,
+            publicURL: null
+        }
     })
 }
 
@@ -255,6 +263,15 @@ function initExploreOtherPicks() {
                 })
         },
         results: []
+    })
+}
+
+// ----------------------------------- 1.1) Alpine Magics -----------------------------------------------------
+
+function initClipBoardMagic() {
+    // Init clipboard magic function
+    Alpine.magic('clipboard', () => clipData => {
+        navigator.clipboard.writeText(clipData)
     })
 }
 
@@ -773,16 +790,28 @@ async function listHandpicksAPI(host) {
             publicURL: "CJJ9ZGQEcK1Jffs6Ji2cTpVW4oiYP6X3VCP9YH4KhC"
         },
         {
-            name: "Max Willows",
-            avatar: "https://api.lorem.space/image/face?hash=92318",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "hkgkhghfj"
+            name: "Lyn Alden",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Provides equity research and investment strategies, the insight and data you need for managing your money.",
+            publicURL: "AGLMqemuHwffaWumSt61HaBDSJB6mwWNyVrYEDy637"
         },
         {
-            name: "Diggwayne Md",
-            avatar: "https://api.lorem.space/image/face?hash=92317",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "uigkhfjfghjhfg"
+            name: "Matthew Ball VC",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Managing Partner of EpyllionCo, which operates an early stage venture fund, as well as a corporate and venture advisory arm.",
+            publicURL: "AJiZJZ8ntrcF9EtRvPuXjLSyr3AE76n4KLsrSSXpvV"
+        },
+        {
+            name: "George Hotz",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "A security hacker, entrepreneur, and software engineer. He's president at comma.ai, set out to f* WIN self driving and robotics. ",
+            publicURL: "GgoEdGqu2kuzqaabQp4KpiaJPG4rpN9eoJgx1zY3or"
+        },
+        {
+            name: "Don't be Evil",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Track how Google is breaking the Internet one step at a time.",
+            publicURL: "9C4DVctaqGSfyZTEjW4YU1i7CsvCWaGSjJyGyM4Wop"
         }
     ]
 }
@@ -790,58 +819,46 @@ async function listHandpicksAPI(host) {
 async function listOtherpicksAPI(host) {
     return [
         {
-            name: "Wei Dailley",
+            name: "Nibin Peter",
             avatar: "https://api.lorem.space/image/face?hash=92319",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "trutrghgfh"
+            description: "Distributed systems developer. Talks about the Web and Linux.",
+            publicURL: "8oWUvderGL6X1MiAtJ4EJmTSveTDnua9DipKDwHqtG"
         },
         {
-            name: "Max Willows",
-            avatar: "https://api.lorem.space/image/face?hash=92318",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "fgjfyggd"
+            name: "Maneksh MS",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Talks about User Experiance.",
+            publicURL: "AWk3YrQBCrr9wzWJjeKEGYoBc6srdkgwBRq81w67D4"
         },
         {
-            name: "Diggwayne Md",
-            avatar: "https://api.lorem.space/image/face?hash=92317",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "fyhjfgbdvxc"
+            name: "Philip Vollet",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Growth Manager. Talks about AI and ML toolchains.",
+            publicURL: "8CyUB3USJ9PDeajhd7XVABvrgj2gCCw1nGB4MtRHFA"
         },
         {
-            name: "Max Willows",
-            avatar: "https://api.lorem.space/image/face?hash=92318",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "hklhgfhfg"
+            name: "Y Combinator News",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Top rated tech news from YC, everyday. YC is created for funding early stage startups.",
+            publicURL: "3NcizoNvMndZwWre9NwhBKFFZ2QvqipCLtoUnjQcZD"
         },
         {
-            name: "Diggwayne Md",
-            avatar: "https://api.lorem.space/image/face?hash=92317",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "kujkvhnfgvfn"
+            name: "Accubits Devs",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Awesome Open Source softwares that software developers at Accubits admire.",
+            publicURL: "EjozLMdHYYWXjJYZb7orN6Zxxbf8KMC9SmzCrUm4bi"
         },
         {
-            name: "Max Willows",
-            avatar: "https://api.lorem.space/image/face?hash=92318",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "iphigbnvjvbn"
+            name: "Indie Hackers",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Top content from Indie Hackers. Indie Entrepreneurs help indies.",
+            publicURL: "DCdvrFMfkvAE1mtp52rsvgEY7wo2Gx6mqiATGkEeGa"
         },
         {
-            name: "Diggwayne Md",
-            avatar: "https://api.lorem.space/image/face?hash=92317",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "ikfyuirethfg"
-        },
-        {
-            name: "Max Willows",
-            avatar: "https://api.lorem.space/image/face?hash=92318",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "nmdrghdrfgh"
-        },
-        {
-            name: "Diggwayne Md",
-            avatar: "https://api.lorem.space/image/face?hash=92317",
-            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
-            publicURL: "rteergfds"
+            name: "Dev.to",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Top rated content from Dev.to platform.",
+            publicURL: "BCkYUwHYUcbtx5etUZUAKHLcyYeQ7Yk3haqKaTGA1a"
         }
     ]
 }
@@ -1122,7 +1139,7 @@ async function userIsSubscribedAction(publicURL) {
     secretKey = Alpine.store('authentication').secretKey
     subStatus = await userIsSubscribedAPI(host, secretKey, publicURL)
         .then(result => {
-            console.log(result) 
+            console.log(result)
             if (result.success && result.isSubscribed.length > 0) {
                 return true
             } else {

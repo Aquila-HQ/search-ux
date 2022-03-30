@@ -146,7 +146,7 @@
 
                     <!--USERS-->
                     <template x-for="result in $store.subscriptionsList.results">
-                        <div class="card bg-base-100 border-b-2 item">
+                        <div class="card bg-base-100 border-b-2 item" x-data="{ showElement: true }" x-show="showElement">
                             <div class="card-body w-100 flex-row p-4 pr-6">
                                 <a class="flex flex-row" :href="location.protocol + '//' + location.host + '?share=' + result.publicURL">
 
@@ -159,7 +159,7 @@
                             </a>
                                 <p></p>
                                 <div class="card-actions justify-end">
-                                    <button class="btn btn-xs btn-outline btn-secondary">- Remove</button>
+                                    <button class="btn btn-xs btn-outline btn-secondary" :id="result.publicURL" @click="onUnSubscribeEvent($event.target.id); showElement = !showElement">- Remove</button>
                                 </div>
                             </div>
                         </div>
