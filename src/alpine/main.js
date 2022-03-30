@@ -23,8 +23,14 @@ document.addEventListener('alpine:init', () => {
     initURLParams()
     initAuthentication()
     initProfileInformation()
+    // home
     initSearchInput()
     initSearchResults()
+    // list
+    initSubscriptionProfilesList()
+    // explore
+    initExploreHandPicks()
+    initExploreOtherPicks()
 })
 
 // Webpage is loaded and ready
@@ -47,13 +53,15 @@ window.onload = function () {
     // --- EXPLORE page ---
     if (Alpine.store('pageParams').page == 'explore') {
         // Fill explore cards accordingly
-        console.log('EXPLORE---------')
+        Alpine.store('exploreHandpicks').loadHandpicksInfo(Alpine.store('authentication').host)
+        Alpine.store('exploreOtherpicks').loadOtherpicksInfo(Alpine.store('authentication').host)
     }
 
     // --- LIST page ---
     if (Alpine.store('pageParams').page == 'list') {
         // Fill mixed search/List content accordingly
         fillMXContentAction()
+        Alpine.store('subscriptionsList').loadSubscriptionInfo(Alpine.store('authentication').host, Alpine.store('authentication').secretKey)
     }
 
 
@@ -189,6 +197,64 @@ function initSearchResults() {
         results: [],
         resultsPerPage: 10,
         nextPage: 1
+    })
+}
+
+function initSubscriptionProfilesList() {
+    // Init list of subscriptions by the user
+    Alpine.store('subscriptionsList', {
+        resett() {
+            this.results = []
+        },
+        loadSubscriptionInfo(host, secretKey) {
+            // call API to get data for a profile with ShareID
+            listSubscriptionsAPI(host, secretKey)
+                .then(result => {
+                    if (result) {
+                        this.results = result
+                        console.log(this.results)
+                    }
+                })
+        },
+        results: []
+    })
+}
+
+function initExploreHandPicks() {
+    // Init list of Handpicked profiles
+    Alpine.store('exploreHandpicks', {
+        resett() {
+            this.results = []
+        },
+        loadHandpicksInfo(host) {
+            // call API to get data for a profile with ShareID
+            listHandpicksAPI(host)
+                .then(result => {
+                    if (result) {
+                        this.results = result
+                    }
+                })
+        },
+        results: []
+    })
+}
+
+function initExploreOtherPicks() {
+    // Init list of Otherpicked profiles
+    Alpine.store('exploreOtherpicks', {
+        resett() {
+            this.results = []
+        },
+        loadOtherpicksInfo(host) {
+            // call API to get data for a profile with ShareID
+            listOtherpicksAPI(host)
+                .then(result => {
+                    if (result) {
+                        this.results = result
+                    }
+                })
+        },
+        results: []
     })
 }
 
@@ -394,9 +460,9 @@ async function listPrivateAPI(host, secretKey, page, noItems) {
         var i = 0, len = sumResponse.length;
         while (i < len) {
             retTmp.push({
-                title: sumResponse[i].title,
+                title: (sumResponse[i].title || sumResponse[i].url).substring(0, 70),
                 url: sumResponse[i].url,
-                description: sumResponse[i].summary,
+                description: sumResponse[i].summary.substring(0, 200) + "..",
                 timestamp: moment((new Date(response.result.links[i].timestamp * 1000))).fromNow(),
                 author: sumResponse[i].author,
                 website: (new URL(sumResponse[i].url)).hostname
@@ -449,9 +515,9 @@ async function searchPrivateAPI(host, secretKey, query, page, noItems) {
         var i = 0, len = sumResponse.length;
         while (i < len) {
             retTmp.push({
-                title: sumResponse[i].title,
+                title: (sumResponse[i].title || sumResponse[i].url).substring(0, 70),
                 url: sumResponse[i].url,
-                description: sumResponse[i].summary,
+                description: sumResponse[i].summary.substring(0, 200) + "..",
                 timestamp: null,
                 author: sumResponse[i].author,
                 website: (new URL(sumResponse[i].url)).hostname
@@ -529,9 +595,9 @@ async function listPublicAPI(host, publicID, page, noItems) {
         var i = 0, len = sumResponse.length;
         while (i < len) {
             retTmp.push({
-                title: sumResponse[i].title,
+                title: (sumResponse[i].title || sumResponse[i].url).substring(0, 70),
                 url: sumResponse[i].url,
-                description: sumResponse[i].summary,
+                description: sumResponse[i].summary.substring(0, 200) + "..",
                 timestamp: moment((new Date(response.result.links[i].timestamp * 1000))).fromNow(),
                 author: sumResponse[i].author,
                 website: (new URL(sumResponse[i].url)).hostname
@@ -584,9 +650,9 @@ async function searchPublicAPI(host, publicID, query, page, noItems) {
         var i = 0, len = sumResponse.length;
         while (i < len) {
             retTmp.push({
-                title: sumResponse[i].title,
+                title: (sumResponse[i].title || sumResponse[i].url).substring(0, 70),
                 url: sumResponse[i].url,
-                description: sumResponse[i].summary,
+                description: sumResponse[i].summary.substring(0, 200) + "..",
                 timestamp: null,
                 author: sumResponse[i].author,
                 website: (new URL(sumResponse[i].url)).hostname
@@ -634,6 +700,239 @@ function correctAPI(host, secretKey, query, url, itemID) {
     return true
 }
 
+async function listSubscriptionsAPI(host, secretKey) {
+    x = [
+        {
+            name: "Wei Dailley",
+            avatar: "https://api.lorem.space/image/face?hash=92319"
+        },
+        {
+            name: "Max Willows",
+            avatar: "https://api.lorem.space/image/face?hash=92318"
+        },
+        {
+            name: "Diggwayne Md",
+            avatar: "https://api.lorem.space/image/face?hash=92317"
+        }
+    ]
+
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "key": secretKey
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/subscribe/list", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return []
+        })
+
+    if (response) {
+        var i = 0, len = response.subscribeList.length;
+
+        retTmp = []
+        while (i < len) {
+            publicIndexId = response.subscribeList[i].publicIndexId
+
+            let profileResponse = await fetchProfileAPI(host, publicIndexId)
+                .then((result) => result)
+
+
+            if (profileResponse) {
+                retTmp.push({
+                    name: profileResponse.name,
+                    avatar: "https://api.lorem.space/image/face?hash=92319",
+                    publicURL: publicIndexId
+                })
+            }
+
+            i++
+        }
+
+        return retTmp
+    } else {
+        return []
+    }
+}
+
+async function listHandpicksAPI(host) {
+    return [
+        {
+            name: "₿ Zero to Maxi 101",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Zero to maxi is a collection of actively curated resources to go head first through Bitcoin rabbit hole, get lost, and never crawl back up, literally 😀⚠️.",
+            publicURL: "CJJ9ZGQEcK1Jffs6Ji2cTpVW4oiYP6X3VCP9YH4KhC"
+        },
+        {
+            name: "Max Willows",
+            avatar: "https://api.lorem.space/image/face?hash=92318",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "hkgkhghfj"
+        },
+        {
+            name: "Diggwayne Md",
+            avatar: "https://api.lorem.space/image/face?hash=92317",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "uigkhfjfghjhfg"
+        }
+    ]
+}
+
+async function listOtherpicksAPI(host) {
+    return [
+        {
+            name: "Wei Dailley",
+            avatar: "https://api.lorem.space/image/face?hash=92319",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "trutrghgfh"
+        },
+        {
+            name: "Max Willows",
+            avatar: "https://api.lorem.space/image/face?hash=92318",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "fgjfyggd"
+        },
+        {
+            name: "Diggwayne Md",
+            avatar: "https://api.lorem.space/image/face?hash=92317",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "fyhjfgbdvxc"
+        },
+        {
+            name: "Max Willows",
+            avatar: "https://api.lorem.space/image/face?hash=92318",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "hklhgfhfg"
+        },
+        {
+            name: "Diggwayne Md",
+            avatar: "https://api.lorem.space/image/face?hash=92317",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "kujkvhnfgvfn"
+        },
+        {
+            name: "Max Willows",
+            avatar: "https://api.lorem.space/image/face?hash=92318",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "iphigbnvjvbn"
+        },
+        {
+            name: "Diggwayne Md",
+            avatar: "https://api.lorem.space/image/face?hash=92317",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "ikfyuirethfg"
+        },
+        {
+            name: "Max Willows",
+            avatar: "https://api.lorem.space/image/face?hash=92318",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "nmdrghdrfgh"
+        },
+        {
+            name: "Diggwayne Md",
+            avatar: "https://api.lorem.space/image/face?hash=92317",
+            description: "Wei Dailey does some cool stuff. A developer by day, shitposter by night, and a Bitcoiner for life.",
+            publicURL: "rteergfds"
+        }
+    ]
+}
+
+async function userSubscribeAPI(host, secretKey, publicID) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "publicIndexId": publicID,
+        "key": secretKey
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/subscribe", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return null
+        })
+
+    if (response) {
+        return response
+    } else {
+        return null
+    }
+}
+
+async function userUnSubscribeAPI(host, secretKey, publicID) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "publicIndexId": publicID,
+        "key": secretKey
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/subscribe/delete", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return null
+        })
+
+    if (response) {
+        return response
+    } else {
+        return null
+    }
+}
+
+async function userIsSubscribedAPI(host, secretKey, publicID) {
+    var myHeaders = new Headers()
+    myHeaders.append("Content-Type", "application/json")
+
+    var raw = JSON.stringify({
+        "publicIndexId": publicID,
+        "key": secretKey
+    })
+
+    var requestOptions = {
+        method: 'POST',
+        headers: myHeaders,
+        body: raw,
+        redirect: 'follow'
+    }
+
+    let response = await fetch(host + "/api/subscribe/check", requestOptions)
+        .then(response => response.json())
+        .catch((error) => {
+            return null
+        })
+
+    if (response) {
+        return response
+    } else {
+        return null
+    }
+}
+
 // ----------------------------------- 3) Event listeners ----------------------------------------- 
 
 // Listen to search input content change
@@ -651,12 +950,34 @@ function onUserSearchedEvent() {
         }
     }
 
-    fillSLContentAction()
+    // --- HOME page ---
+    if (Alpine.store('pageParams').page == 'home') {
+        // Fill search/List content accordingly
+        fillSLContentAction()
+    }
+
+    // --- LIST page ---
+    if (Alpine.store('pageParams').page == 'list') {
+        // Fill mixed search/List content accordingly
+        fillMXContentAction()
+        Alpine.store('subscriptionsList').loadSubscriptionInfo(Alpine.store('authentication').host, Alpine.store('authentication').secretKey)
+    }
+
 }
 
 // Theme toggled
 function onThemeToggleEvent() {
     Alpine.store('pageParams').toggleTheme()
+}
+
+// Add to list button is pressed
+function onSubscribeEvent(publicURL) {
+    performSubscribeAction(publicURL)
+}
+
+// Remove from list button is pressed
+function onUnSubscribeEvent(publicURL) {
+    performUnSubscribeAction(publicURL)
 }
 
 // ----------------------------------- 4) Actions -----------------------------------------
@@ -742,10 +1063,10 @@ function fillMXContentAction() {
 
     if (!Alpine.store('urlParams').queryText) {
         // list items
-        performListAction(Alpine.store('authentication').host, Alpine.store('authentication').secretKey)
+        performMXListAction(Alpine.store('authentication').host, Alpine.store('authentication').secretKey)
     } else {
         // search items
-        performSearchAction(Alpine.store('authentication').host, Alpine.store('authentication').secretKey, Alpine.store('urlParams').queryText)
+        performMXSearchAction(Alpine.store('authentication').host, Alpine.store('authentication').secretKey, Alpine.store('urlParams').queryText)
     }
 }
 
@@ -762,7 +1083,6 @@ function performMXSearchAction(host, key, query) {
         .then(result => {
             Alpine.store('listedResults').results = result
         })
-
 }
 
 // List items
@@ -778,5 +1098,37 @@ function performMXListAction(host, key) {
         .then(result => {
             Alpine.store('listedResults').results = result
         })
+}
 
+// Subscribe to a public URL
+function performSubscribeAction(publicURL) {
+    host = Alpine.store('authentication').host
+    secretKey = Alpine.store('authentication').secretKey
+    userSubscribeAPI(host, secretKey, publicURL)
+        .then(result => { console.log(result) })
+}
+
+// Unsubscribe from a public URL
+function performUnSubscribeAction(publicURL) {
+    host = Alpine.store('authentication').host
+    secretKey = Alpine.store('authentication').secretKey
+    userUnSubscribeAPI(host, secretKey, publicURL)
+        .then(result => { console.log(result) })
+}
+
+// Check subscription to a public URL
+async function userIsSubscribedAction(publicURL) {
+    host = Alpine.store('authentication').host
+    secretKey = Alpine.store('authentication').secretKey
+    subStatus = await userIsSubscribedAPI(host, secretKey, publicURL)
+        .then(result => {
+            console.log(result) 
+            if (result.success && result.isSubscribed.length > 0) {
+                return true
+            } else {
+                return false
+            }
+        })
+
+    return subStatus
 }

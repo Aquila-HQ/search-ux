@@ -3,7 +3,7 @@
 <!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
 <!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
 <!--[if gt IE 8]>      <html class="no-js"> <![endif]-->
-<html data-theme="emerald">
+<html x-data data-theme="emerald" :data-theme="$store.pageParams.theme">
 
 <head>
     <meta charset="utf-8">
@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/daisyui@2.6.1/dist/full.css" rel="stylesheet" type="text/css" />
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://unpkg.com/alpinejs" defer></script>
 
 </head>
 
@@ -57,17 +58,22 @@
                 <img class="w-10 row-span-1 mask mask-circle rounded-full"
                     src="https://api.lorem.space/image/face?hash=33791">
             </div> -->
-            <a href="/src/alpine/profile.html" class="btn btn-sm">Profile</a>
-            <label class="ml-5 swap swap-rotate">
+            <template x-if="$store.authentication.isAuthenticated">
+                <a href="/src/alpine/profile.html" class="btn btn-sm">Profile</a>
+            </template>
+            <template x-if="!$store.authentication.isAuthenticated">
+                <a href="#" class="btn btn-sm">Create Account</a>
+            </template>
+            <label class="ml-5 swap swap-rotate" @click="onThemeToggleEvent()">
                 <!-- this hidden checkbox controls the state -->
-                <input type="checkbox" />
+                <input type="checkbox" @click="onThemeToggleEvent()" />
                 <!-- sun icon -->
-                <svg class="swap-off fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <svg class="swap-on fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
                         d="M5.64,17l-.71.71a1,1,0,0,0,0,1.41,1,1,0,0,0,1.41,0l.71-.71A1,1,0,0,0,5.64,17ZM5,12a1,1,0,0,0-1-1H3a1,1,0,0,0,0,2H4A1,1,0,0,0,5,12Zm7-7a1,1,0,0,0,1-1V3a1,1,0,0,0-2,0V4A1,1,0,0,0,12,5ZM5.64,7.05a1,1,0,0,0,.7.29,1,1,0,0,0,.71-.29,1,1,0,0,0,0-1.41l-.71-.71A1,1,0,0,0,4.93,6.34Zm12,.29a1,1,0,0,0,.7-.29l.71-.71a1,1,0,1,0-1.41-1.41L17,5.64a1,1,0,0,0,0,1.41A1,1,0,0,0,17.66,7.34ZM21,11H20a1,1,0,0,0,0,2h1a1,1,0,0,0,0-2Zm-9,8a1,1,0,0,0-1,1v1a1,1,0,0,0,2,0V20A1,1,0,0,0,12,19ZM18.36,17A1,1,0,0,0,17,18.36l.71.71a1,1,0,0,0,1.41,0,1,1,0,0,0,0-1.41ZM12,6.5A5.5,5.5,0,1,0,17.5,12,5.51,5.51,0,0,0,12,6.5Zm0,9A3.5,3.5,0,1,1,15.5,12,3.5,3.5,0,0,1,12,15.5Z" />
                 </svg>
                 <!-- moon icon -->
-                <svg class="swap-on fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                <svg class="swap-off fill-current w-7 h-7" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
                         d="M21.64,13a1,1,0,0,0-1.05-.14,8.05,8.05,0,0,1-3.37.73A8.15,8.15,0,0,1,9.08,5.49a8.59,8.59,0,0,1,.25-2A1,1,0,0,0,8,2.36,10.14,10.14,0,1,0,22,14.05,1,1,0,0,0,21.64,13Zm-9.5,6.69A8.14,8.14,0,0,1,7.08,5.22v.27A10.15,10.15,0,0,0,17.22,15.63a9.79,9.79,0,0,0,2.1-.22A8.11,8.11,0,0,1,12.14,19.73Z" />
                 </svg>
@@ -78,656 +84,58 @@
     <!--GRID Staff-->
     <h1 class="text-2xl font-bold ml-10 mt-10">Hand picks</h1>
     <div class="flex gap-4 mt-4 mb-10 ml-12 mr-5 overflow-auto">
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=123" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
+        <template x-for="result in $store.exploreHandpicks.results">
+            <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
+                <!-- <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=123" alt="Shoes"> -->
+                </figure>
+                <div class="card-body w-64">
+                    <div class="flex">
+                        <div class="avatar items-center pr-3">
+                            <div class="w-8 h-8 rounded-full">
+                                <img :src="'https://source.boringavatars.com/beam/120/'+result.publicURL+'?square'">
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <h2 class="card-title pr-5" x-text="result.name.substring(0,10)"></h2>
                         </div>
                     </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
+                    <div class="border-t-2 -mb-7">
+                        <p class="pt-2 text-left text-sm" x-text="result.description.substring(0,100)"></p>
+                        <a :href="location.protocol + '//' + location.host + '?share=' + result.publicURL"><button
+                            class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button></a>
                     </div>
                 </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
             </div>
-        </div>
+        </template>
 
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=1235" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=1236" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=1237" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=1238" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=1239" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=1230" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=12311" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card min-w-max w-64 mt-5 mb-10 bg-base-100 shadow-xl">
-            <figure class="w-64"><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=12312" alt="Shoes">
-            </figure>
-            <div class="card-body w-64">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                        <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!--GRID Other-->
     <h1 class="text-2xl font-bold ml-10 mt-14">Public Bookmarks</h1>
     <div class="flex flex-wrap gap-12 justify-center mt-4 mb-10 ml-5 mr-5">
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=12313" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
+        <template x-for="result in $store.exploreOtherpicks.results">
+            <div class="card w-64 h-94 bg-base-100 shadow-xl">
+                <!-- <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=12313" alt="Shoes"></figure> -->
+                <div class="card-body">
+                    <div class="flex">
+                        <div class="avatar items-center pr-3">
+                            <div class="w-8 h-8 rounded-full">
+                                <img :src="'https://source.boringavatars.com/beam/120/'+result.publicURL+'?square'">
+                            </div>
+                        </div>
+                        <div class="flex items-center">
+                            <h2 class="card-title pr-5" x-text="result.name.substring(0,10)"></h2>
                         </div>
                     </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
+                    <div class="border-t-2 -mb-7">
+                        <p class="pt-2 text-left text-sm" x-text="result.description.substring(0,100)"></p>
+                        <a :href="location.protocol + '//' + location.host + '?share=' + result.publicURL"><button
+                            class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button></a>
                     </div>
                 </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
             </div>
-        </div>
+        </template>
 
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=12365" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=1236587" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225&hash=123653" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
-
-        <div class="card w-64 h-94 bg-base-100 shadow-xl">
-            <figure><img src="https://api.lorem.space/image/shoes?w=400&h=225" alt="Shoes"></figure>
-            <div class="card-body">
-                <div class="flex">
-                    <div class="avatar items-center pr-3">
-                        <div class="w-8 h-8 rounded-full">
-                            <img src="https://api.lorem.space/image/face?hash=92310">
-                        </div>
-                    </div>
-                    <div class="flex items-center">
-                        <h2 class="card-title pr-5">Wei Dailey</h2>
-                    </div>
-                </div>
-                <div class="border-t-2 -mb-7">
-                    <p class="pt-2 text-left text-sm">Wei Dailey does some cool stuff. A developer by day,
-                        shitposter by night, and a Bitcoiner for life.</p>
-                    <button
-                        class="btn-sm rounded-box pl-10 pb-6 pr-4 pt-1 btn-primary relative right-12 -bottom-2">+</button>
-                </div>
-            </div>
-        </div>
     </div>
 
 
@@ -766,7 +174,12 @@
         </div>
     </footer>
 
-    <script src="https://cdn.tailwindcss.com" async defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/@ryangjchandler/spruce@2.x.x/dist/spruce.umd.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+        integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="/src/alpine/main.js"></script>
 </body>
 
 </html>
