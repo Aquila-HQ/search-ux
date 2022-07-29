@@ -41,32 +41,35 @@ window.onload = function () {
     Alpine.store('urlParams').loadURLParams()
     // initialize user by performing authentication on load
     Alpine.store('authentication').authenticate()
-    // load profile, if share URL param is given
-    if (Alpine.store('urlParams').shareID != null) {
-        Alpine.store('profileInfo').loadProfileInfo(Alpine.store('authentication').host, Alpine.store('urlParams').shareID)
-    }
+        .then(response => {
 
-    // --- HOME page ---
-    if (Alpine.store('pageParams').page == 'home') {
-        // Fill search/List content accordingly
-        fillSLContentAction()
-    }
+            // load profile, if share URL param is given
+            if (Alpine.store('urlParams').shareID != null) {
+                Alpine.store('profileInfo').loadProfileInfo(Alpine.store('authentication').host, Alpine.store('urlParams').shareID)
+            }
 
-    // --- EXPLORE page ---
-    if (Alpine.store('pageParams').page == 'explore') {
-        // Fill explore cards accordingly
-        Alpine.store('exploreHandpicks').loadHandpicksInfo(Alpine.store('authentication').host)
-        Alpine.store('exploreOtherpicks').loadOtherpicksInfo(Alpine.store('authentication').host)
-    }
+            // --- HOME page ---
+            if (Alpine.store('pageParams').page == 'home') {
+                // Fill search/List content accordingly
+                fillSLContentAction()
+            }
 
-    // --- LIST page ---
-    if (Alpine.store('pageParams').page == 'list') {
-        // Fill mixed search/List content accordingly
-        fillMXContentAction()
-        Alpine.store('subscriptionsList').loadSubscriptionInfo(Alpine.store('authentication').host, Alpine.store('authentication').secretKey)
-    }
+            // --- EXPLORE page ---
+            if (Alpine.store('pageParams').page == 'explore') {
+                // Fill explore cards accordingly
+                Alpine.store('exploreHandpicks').loadHandpicksInfo(Alpine.store('authentication').host)
+                Alpine.store('exploreOtherpicks').loadOtherpicksInfo(Alpine.store('authentication').host)
+            }
+
+            // --- LIST page ---
+            if (Alpine.store('pageParams').page == 'list') {
+                // Fill mixed search/List content accordingly
+                fillMXContentAction()
+                Alpine.store('subscriptionsList').loadSubscriptionInfo(Alpine.store('authentication').host, Alpine.store('authentication').secretKey)
+            }
 
 
+        })
 }
 
 // ----------------------------- 1) Configure Alpine datastructures --------------------------------------------------
@@ -119,10 +122,10 @@ function initURLParams() {
 function initAuthentication() {
     // Authenticate user by communicating with addon, fetch user profile & keep it
     Alpine.store('authentication', {
-        authenticate() {
+        async authenticate() {
 
             // get secret key from addon
-            addonData = fetchSecretADDON()
+            addonData = await fetchSecretADDON()
 
             // update host, secret
             this.host = addonData.host
@@ -191,9 +194,9 @@ function initSearchResults() {
     // configure & cache search results for a personal/public search & aggregated search separately
     Alpine.store('listedResults', {
         resett() {
-            this.results = []
+            this.results = undefined
         },
-        results: [],
+        results: undefined,
         resultsPerPage: 10,
         nextPage: 1
     })
@@ -220,7 +223,6 @@ function initSubscriptionProfilesList() {
                 .then(result => {
                     if (result) {
                         this.results = result
-                        console.log(this.results)
                     }
                 })
         },
@@ -278,33 +280,52 @@ function initClipBoardMagic() {
 // ----------------------------------- 2) API calls to addon / server -----------------------------------------
 
 function fetchSecretADDON() {
+    host = "https://x.aquila.network"
     secretKey = null
 
-    try {
-        if (chrome && chrome.runtime) {
-            chrome.runtime.sendMessage(chromeExtensionID, {},
-                function (response) {
-                    if (response && response.success) {
-                        secretKey = response.key
-                    }
-                    else {
-                        secretKey = localStorage.getItem("axapi")
-                    }
-                }
-            )
-        }
-        else {
-            secretKey = localStorage.getItem("axapi")
-        }
-    }
-    catch (e) {
-        secretKey = localStorage.getItem("axapi")
-    }
+    return new Promise(function (resolve, reject) {
+        // setTimeout(function () {
+        //     resolve('test');
+        // }, 4000);
 
-    return {
-        host: "https://x.aquila.network",
-        secretKey: "SR5Akwx21626763430" // secretKey // TBD: change later
-    }
+
+        try {
+            if (chrome && chrome.runtime) {
+                chrome.runtime.sendMessage(chromeExtensionID, {},
+                    function (response) {
+                        if (response && response.success) {
+                            secretKey = response.key
+                            resolve({
+                                host: host,
+                                secretKey: secretKey
+                            })
+                        }
+                        else {
+                            secretKey = localStorage.getItem("axapi")
+                            resolve({
+                                host: host,
+                                secretKey: secretKey
+                            })
+                        }
+                    }
+                )
+            }
+            else {
+                secretKey = localStorage.getItem("axapi")
+                resolve({
+                    host: host,
+                    secretKey: secretKey
+                })
+            }
+        }
+        catch (e) {
+            secretKey = localStorage.getItem("axapi")
+            resolve({
+                host: host,
+                secretKey: secretKey
+            })
+        }
+    });
 }
 
 async function AuthenticateAPI(host, secretKey) {
@@ -490,7 +511,7 @@ async function listPrivateAPI(host, secretKey, page, noItems) {
 
         return retTmp
     } else {
-        return []
+        return null
     }
 }
 
@@ -545,7 +566,7 @@ async function searchPrivateAPI(host, secretKey, query, page, noItems) {
 
         return retTmp
     } else {
-        return []
+        return null
     }
 }
 
@@ -571,10 +592,10 @@ async function URLSummaryPrivateAPI(host, secretKey, urls) {
             return null
         })
 
-    if (response) {
+    if (response && response.result) {
         return response.result.summary
     } else {
-        return null
+        return []
     }
 }
 
@@ -625,7 +646,7 @@ async function listPublicAPI(host, publicID, page, noItems) {
 
         return retTmp
     } else {
-        return []
+        return null
     }
 }
 
@@ -680,7 +701,7 @@ async function searchPublicAPI(host, publicID, query, page, noItems) {
 
         return retTmp
     } else {
-        return []
+        return null
     }
 }
 
@@ -706,10 +727,10 @@ async function URLSummaryPublicAPI(host, publicID, urls) {
             return null
         })
 
-    if (response) {
+    if (response && response.result) {
         return response.result.summary
     } else {
-        return null
+        return []
     }
 }
 
@@ -1122,7 +1143,7 @@ function performSubscribeAction(publicURL) {
     host = Alpine.store('authentication').host
     secretKey = Alpine.store('authentication').secretKey
     userSubscribeAPI(host, secretKey, publicURL)
-        .then(result => { console.log(result) })
+        .then(result => { })
 }
 
 // Unsubscribe from a public URL
@@ -1130,7 +1151,7 @@ function performUnSubscribeAction(publicURL) {
     host = Alpine.store('authentication').host
     secretKey = Alpine.store('authentication').secretKey
     userUnSubscribeAPI(host, secretKey, publicURL)
-        .then(result => { console.log(result) })
+        .then(result => { })
 }
 
 // Check subscription to a public URL
@@ -1139,7 +1160,6 @@ async function userIsSubscribedAction(publicURL) {
     secretKey = Alpine.store('authentication').secretKey
     subStatus = await userIsSubscribedAPI(host, secretKey, publicURL)
         .then(result => {
-            console.log(result)
             if (result.success && result.isSubscribed.length > 0) {
                 return true
             } else {
